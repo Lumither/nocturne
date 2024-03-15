@@ -5,7 +5,7 @@ import { Inter as FontSans } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
-import Header from '@/app/header';
+import Navbar from '@/app/navbar';
 
 
 const fontSans = FontSans({
@@ -30,11 +30,11 @@ export default function RootLayout({
         ) }>
         <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
         >
-            <Header />
+            <Navbar />
             { children }
         </ThemeProvider>
         </body>
