@@ -38,6 +38,7 @@
     .dark {
         --background: radial-gradient(circle at center bottom, rgb(2, 35, 96) 0%, rgb(14, 26, 91) 25%, rgba(2, 0, 36, 1) 61%);
         background: var(--background);
+        background-attachment: fixed;
 
         --foreground: 210 40% 98%;
 
