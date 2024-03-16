@@ -5,13 +5,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from '@/components/ui/navigation-menu';
 import Link from 'next/link';
 
-const components: { title: string; href: string; description: string }[] = [
+const entries: { display_name: string; href: string; }[] = [
     {
-        title: 'title of subpage',
-        href: 'url',
-        description:
-            'a description'
+        display_name: 'About',
+        href: '/about'
+    },
+    {
+        display_name: 'Archive',
+        href: 'archive'
     }
+
 ];
 export default function Navbar() {
     const [ scrolled, setScrolled ] = useState(false);
@@ -54,17 +57,15 @@ export default function Navbar() {
 
                     <div></div>
 
-                    <NavigationMenuItem>
-                        <Link href={ '/about' }>
-                            <p className={ 'transition-all duration-300 hover:text-resolution-blue-400' }>{ 'About' }</p>
-                        </Link>
-                    </NavigationMenuItem>
-
-                    <NavigationMenuItem>
-                        <Link href={ '/archives' }>
-                            <p className={ 'transition-all duration-300 hover:text-resolution-blue-400' }>{ 'Archives' }</p>
-                        </Link>
-                    </NavigationMenuItem>
+                    {
+                        entries.map((entry, id) => (
+                            <NavigationMenuItem key={ id }>
+                                <Link href={ entry.href }>
+                                    <p className={ 'transition-all duration-300 hover:text-resolution-blue-400' }>{ entry.display_name }</p>
+                                </Link>
+                            </NavigationMenuItem>
+                        ))
+                    }
 
                 </NavigationMenuList>
             </NavigationMenu>
