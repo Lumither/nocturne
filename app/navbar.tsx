@@ -43,7 +43,8 @@ export default function Navbar() {
                     className={ `flex space-x-4  transition-all duration-500 ${ scrolled ? 'space-x-3' : '' }` }>
                     <NavigationMenuItem>
                         <Avatar className={ 'transition-all duration-300 hover:scale-125' }>
-                            <AvatarImage src={ 'https://avatars.githubusercontent.com/u/46409277' } />
+                            <AvatarImage src={ 'https://avatars.githubusercontent.com/u/46409277' }
+                                         alt={ 'Lumither\'s Avatar' } />
                             <AvatarFallback>Tao</AvatarFallback>
                         </Avatar>
 
@@ -55,7 +56,7 @@ export default function Navbar() {
                         </Link>
                     </NavigationMenuItem>
 
-                    <div></div>
+                    <NavigationMenuItem></NavigationMenuItem>
 
                     {
                         entries.map((entry, id) => (
