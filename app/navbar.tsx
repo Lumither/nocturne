@@ -12,7 +12,7 @@ const entries: { display_name: string; href: string; }[] = [
     },
     {
         display_name: 'Archive',
-        href: 'archive'
+        href: '/archive'
     }
 
 ];
@@ -42,11 +42,14 @@ export default function Navbar() {
                 <NavigationMenuList
                     className={ `flex space-x-4  transition-all duration-500 ${ scrolled ? 'space-x-3' : '' }` }>
                     <NavigationMenuItem>
-                        <Avatar className={ 'transition-all duration-300 hover:scale-125' }>
-                            <AvatarImage src={ 'https://avatars.githubusercontent.com/u/46409277' }
-                                         alt={ 'Lumither\'s Avatar' } />
-                            <AvatarFallback>Tao</AvatarFallback>
-                        </Avatar>
+
+                        <Link href={ '/about' }>
+                            <Avatar className={ 'transition-all duration-300 hover:scale-125' }>
+                                <AvatarImage src={ 'https://avatars.githubusercontent.com/u/46409277' }
+                                             alt={ 'Lumither\'s Avatar' } />
+                                <AvatarFallback>Tao</AvatarFallback>
+                            </Avatar>
+                        </Link>
 
                     </NavigationMenuItem>
 

@@ -14,7 +14,7 @@ const config = {
         fontFamily: {
             sans: [ 'var(--font-sans)', ...fontFamily.sans ]
         },
-        container: {
+        container:  {
             center: true,
             padding: '2rem',
             screens: {
