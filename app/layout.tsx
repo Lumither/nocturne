@@ -35,7 +35,11 @@ export default function RootLayout({
             disableTransitionOnChange
         >
             <Navbar />
-            { children }
+            <div className={ 'h-screen' }>
+                <div className={ 'mt-20 overflow-scroll' }>
+                    { children }
+                </div>
+            </div>
         </ThemeProvider>
         </body>
         </html>

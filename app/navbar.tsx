@@ -36,9 +36,9 @@ export default function Navbar() {
         <div
             className={ `flex flex-row fixed top-0 z-10 transition-all duration-300 backdrop-blur 
             ${ scrolled ? 'rounded-3xl w-[95%] ml-[2.5%] mr-[2.5%] mt-[1%] border-resolution-blue-200 border'
-                : 'w-full border-slate-200/15 border-b shadow' }` }>
+                : 'w-full border-slate-200/15 border-b shadow h-20' }` }>
             <div className={ `transition-all duration-300 ${ scrolled ? 'w-0' : 'w-[5%]' }` }></div>
-            <NavigationMenu className={ `transition-all duration-300 ${ scrolled ? '' : 'my-5' }` }>
+            <NavigationMenu className={ `transition-all duration-300` }>
                 <NavigationMenuList
                     className={ `flex space-x-4  transition-all duration-500 ${ scrolled ? 'space-x-3' : '' }` }>
                     <NavigationMenuItem>
