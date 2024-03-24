@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 import Navbar from '@/app/navbar';
+import Footer from '@/app/footer';
 
 
 const fontSans = FontSans({
@@ -39,6 +40,7 @@ export default function RootLayout({
                 <div className={ 'mt-20 overflow-scroll' }>
                     { children }
                 </div>
+                <Footer />
             </div>
         </ThemeProvider>
         </body>
