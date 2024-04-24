@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { Button } from '@nextui-org/react';
+import { Switch } from '@nextui-org/react';
+import { MdOutlineDarkMode, MdOutlineLightMode } from 'react-icons/md';
 
 function ThemeSwitcher() {
     const [ mounted, setMounted ] = useState(false);
@@ -18,12 +19,18 @@ function ThemeSwitcher() {
 
     return (
         <div>
-            <Button onClick={ () => {
-                setTheme('light');
-            } }>Light Mode</Button>
-            <Button onClick={ () => {
-                setTheme('dark');
-            } }>Dark Mode</Button>
+            <Switch
+                color={ 'default' }
+                startContent={ <MdOutlineLightMode /> }
+                endContent={ <MdOutlineDarkMode /> }
+                onValueChange={ (isSelected) => {
+                    if (isSelected) {
+                        setTheme('light');
+                    } else {
+                        setTheme('dark');
+                    }
+                } }
+            ></Switch>
         </div>
     );
 }

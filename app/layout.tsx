@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import React from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import Navbar from '@/components/Navbar';
 
 const inter = Inter({ subsets: [ 'latin' ] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
         <body className={ inter.className }>
         <NextThemesProvider attribute="class" defaultTheme="dark">
+            <Navbar />
             { children }
         </NextThemesProvider>
         </body>
