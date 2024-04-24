@@ -6,7 +6,7 @@ import { Button } from '@nextui-org/react';
 
 function ThemeSwitcher() {
     const [ mounted, setMounted ] = useState(false);
-    const { theme, setTheme, themes } = useTheme();
+    const { setTheme } = useTheme();
 
     useEffect(() => {
         setMounted(true);
