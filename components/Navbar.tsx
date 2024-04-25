@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import {
+    Image,
     Navbar as NextUINavbar,
     NavbarBrand,
     NavbarContent,
@@ -48,17 +49,30 @@ function Navbar() {
     return (
         <>
             <NextUINavbar isBlurred isBordered>
+
                 <NavbarContent className="sm:hidden" justify="start">
                     <NavbarMenuToggle />
                 </NavbarContent>
 
                 <NavbarContent className="sm:hidden pr-3" justify="center">
+                    <Image
+                        src={ 'https://avatars.githubusercontent.com/u/46409277?v=4' }
+                        alt={ 'avatar' }
+                        className={ 'rounded-full h-[3rem]' }
+                    ></Image>
+
                     <NavbarBrand>
                         <p className="font-bold text-inherit">{ 'Lumither\'s site' }</p>
                     </NavbarBrand>
                 </NavbarContent>
 
                 <NavbarContent className="hidden sm:flex gap-4" justify="center">
+                    <Image
+                        src={ 'https://avatars.githubusercontent.com/u/46409277?v=4' }
+                        alt={ 'avatar' }
+                        className={ 'rounded-full h-[3rem]' }
+                    ></Image>
+
                     <NavbarBrand>
                         <p className="font-bold text-inherit">{ 'Lumither\'s site' }</p>
                     </NavbarBrand>
