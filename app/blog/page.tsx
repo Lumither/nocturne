@@ -1,16 +1,17 @@
 import React from 'react';
-import fetch_posts from '@/app/blog/fetch_posts';
+import fetch_posts_list from '@/app/blog/fetch_posts_list';
 import BlogPostCard from '@/app/blog/BlogPostCard';
 
 async function Blog() {
 
-    const res = await fetch_posts(process.env.BLOG_ENDPOINT!);
+    const res = await fetch_posts_list();
     if (!res.ok) {
         console.log(res.error);
         return;
     }
     const posts = res.value;
-    // console.log(posts);
+
+    console.log(posts);
 
     return (
 

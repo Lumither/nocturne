@@ -1,7 +1,7 @@
 import { Result } from '@/app/public/type/Result';
 
-export default async function fetch_posts(url: string): Promise<Result<JSON[], Error>> {
-    const response = await fetch(`${ url }/posts/idx.json`);
+export default async function fetch_posts_list(): Promise<Result<JSON[], Error>> {
+    const response = await fetch(`${ process.env.BLOG_ENDPOINT }/posts/idx.json`);
     if (!response.ok) {
         return {
             ok: false,

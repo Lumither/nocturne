@@ -13,7 +13,9 @@ const config: Config = {
     //     extend: {}
     // },
     darkMode: 'class',
-    plugins: [ nextui(
+    plugins: [
+        require('@tailwindcss/typography'),
+        nextui(
         {
             // defaultTheme: 'dark',
             defaultExtendTheme: 'light',
