@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Markdown from 'react-markdown';
-import { test_markdown } from '@/app/blog/post/[id]/test_markdown';
 import { Card, CardBody } from '@nextui-org/card';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
@@ -28,7 +27,7 @@ async function Generate(props: Props) {
             <Card className={ `w-full max-w-[1024px]` }>
                 <CardBody>
                     <Markdown
-                        className={`mx-5 my-5 max-w-none prose dark:prose-invert sm:prose-sm md:prose-sm lg:prose-lg`}
+                        className={ `mx-5 my-5 max-w-none prose dark:prose-invert sm:prose-sm md:prose-sm lg:prose-lg` }
                         remarkPlugins={ [ remarkGfm, remarkToc ] }
                         rehypePlugins={ [ rehypeHighlight, rehypeRaw, rehypeSanitize ] }
                     >{ post_md }</Markdown>
