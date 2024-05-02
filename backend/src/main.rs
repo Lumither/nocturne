@@ -2,12 +2,13 @@ use std::env;
 use std::error::Error;
 
 use axum::Router;
-use axum::routing::get;
+use axum::routing::{get, post};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 
-use crate::api::get_post::get_post;
-use crate::api::get_post_list::get_post_list;
+use crate::api::get::get_post::get_post;
+use crate::api::get::get_post_list::get_post_list;
+use crate::api::post::refresh::refresh;
 
 mod api;
 mod model;
@@ -29,6 +30,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .expect("failed to load database");
 
     let app = Router::new()
+        .route("/api/post/refresh", post(refresh))
         .route("/api/get/post_list", get(get_post_list))
         .route("/api/get/post/:post_id", get(get_post))
         .with_state(db_pool);
