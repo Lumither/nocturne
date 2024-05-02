@@ -1,4 +1,4 @@
-CREATE TABLE Post
+CREATE TABLE IF NOT EXISTS Post
 (
     post_id     UUID PRIMARY KEY,
     title       VARCHAR(255) NOT NULL,

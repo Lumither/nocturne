@@ -40,3 +40,6 @@ bun.lockb
 
 # ide related
 .idea
+
+# tmp git working dir
+/blog_posts_git/
