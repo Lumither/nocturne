@@ -1,18 +1,32 @@
 use axum::extract::State;
 use axum::Json;
-use serde_json::Value;
-use sqlx::PgPool;
-
-use crate::model::Post;
+use chrono::NaiveDateTime;
+use serde_json::{json, Map, Value};
+use sqlx::{PgPool, Row};
+use uuid::Uuid;
 
 pub async fn get_post_list(
     State(db_connection): State<PgPool>,
-    Json(_request): Json<Value>,
 ) -> Result<Json<Value>, Json<Value>> {
-    let post_list: Vec<Post> = sqlx::query_as("select * from post")
+    let post_list = sqlx::query("select post_id, title, summary, last_update from post")
         .fetch_all(&db_connection)
         .await
         .unwrap();
-    dbg!(&post_list);
-    Ok(Json::from(serde_json::to_value(post_list).unwrap()))
+
+    let mut res = Map::new();
+    for post in post_list {
+        let mut tmp = Map::new();
+        let post_id: Uuid = post.get("post_id");
+        let title: String = post.get("title");
+        let summary: String = post.get("summary");
+        let last_update: NaiveDateTime = post.get("last_update");
+
+        tmp.insert("title".to_string(), json!(title));
+        tmp.insert("summary".to_string(), json!(summary));
+        tmp.insert("last_update".to_string(), json!(last_update));
+
+        res.insert(post_id.to_string(), Value::from(tmp));
+    }
+
+    Ok(Json::from(Value::from(res)))
 }
