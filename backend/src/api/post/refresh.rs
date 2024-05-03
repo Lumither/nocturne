@@ -29,30 +29,30 @@ pub async fn refresh(
 
     let post_list: Vec<Post> = md_list
         .into_iter()
-        .map(Post::from_path)
+        .map(|post| Post::from_path(post).unwrap())
         .collect();
 
     for post in post_list {
         match query(
             r##"
-INSERT INTO Post (post_id, title, content, last_update)
-VALUES ($1, $2, $3, $4)
+INSERT INTO Post (post_id, title, summary, content, last_update)
+VALUES ($1, $2, $3, $4, $5)
 ON CONFLICT (post_id)
     DO UPDATE SET title       = excluded.title,
+                  summary     = excluded.summary,
                   content     = excluded.content,
                   last_update = excluded.last_update
         "##,
         )
             .bind(post.post_id)
             .bind(post.title)
+            .bind(post.summary)
             .bind(post.content)
             .bind(post.last_update)
             .execute(&db_connection)
             .await
         {
-            Ok(_) => {
-                dbg!("inserted");
-            }
+            Ok(_) => {}
             Err(e) => {
                 return Err((
                     StatusCode::INTERNAL_SERVER_ERROR,

@@ -9,6 +9,9 @@ pub mod post;
 pub struct Post {
     pub post_id: Uuid,
     pub title: String,
+    pub summary: String,
     pub content: String,
     pub last_update: NaiveDateTime,
 }
+
+

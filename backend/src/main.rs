@@ -12,6 +12,7 @@ use crate::api::post::refresh::refresh;
 
 mod api;
 mod model;
+mod markdown;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
