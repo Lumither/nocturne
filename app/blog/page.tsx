@@ -4,26 +4,27 @@ import BlogPostCard from '@/app/blog/BlogPostCard';
 
 async function Blog() {
 
-    const res = await fetch_posts_list();
-    if (!res.ok) {
-        console.log(res.error);
-        return;
+    try {
+        const res = await fetch_posts_list();
+        let posts = res['posts'];
+        return (
+            // blog list
+            <ul className={ 'flex flex-col items-center w-full max-w-[1024px]' }>
+                { posts.map((post: JSON, key: React.Key | null | undefined) => (
+                    <li key={ key } className={ 'my-3.5 mx-7 w-[80%]' }>
+                        <BlogPostCard post={ post } />
+                    </li>)
+                ) }
+            </ul>
+        );
+    } catch (e: any) {
+        return (
+            <>
+                { e.toString() }
+            </>
+        );
     }
-    const posts = res.value;
 
-    console.log(posts);
-
-    return (
-
-        // blog list
-        <ul className={ 'flex flex-col items-center w-full max-w-[1024px]' }>
-            { posts.map((post, key) => (
-                <li key={ key } className={ 'my-3.5 mx-7 w-[80%]' }>
-                    <BlogPostCard post={ post } />
-                </li>)
-            ) }
-        </ul>
-    );
 }
 
 export default Blog;
