@@ -14,19 +14,24 @@ pub async fn get_post_list(
         .unwrap();
 
     let mut res = Map::new();
-    for post in post_list {
-        let mut tmp = Map::new();
-        let post_id: Uuid = post.get("post_id");
-        let title: String = post.get("title");
-        let summary: String = post.get("summary");
-        let last_update: NaiveDateTime = post.get("last_update");
+    let posts: Vec<Value> = post_list
+        .into_iter()
+        .map(|post| {
+            let mut tmp = Map::new();
+            let post_id: Uuid = post.get("post_id");
+            let title: String = post.get("title");
+            let summary: String = post.get("summary");
+            let last_update: NaiveDateTime = post.get("last_update");
 
-        tmp.insert("title".to_string(), json!(title));
-        tmp.insert("summary".to_string(), json!(summary));
-        tmp.insert("last_update".to_string(), json!(last_update));
+            tmp.insert("post_id".to_string(), json!(post_id.to_string()));
+            tmp.insert("title".to_string(), json!(title));
+            tmp.insert("summary".to_string(), json!(summary));
+            tmp.insert("last_update".to_string(), json!(last_update));
 
-        res.insert(post_id.to_string(), Value::from(tmp));
-    }
+            Value::from(tmp)
+        })
+        .collect();
 
+    res.insert("posts".to_string(), Value::from(posts));
     Ok(Json::from(Value::from(res)))
 }
