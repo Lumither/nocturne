@@ -2,6 +2,7 @@ use std::{env, fs};
 use std::error::Error;
 use std::process::Command;
 use std::str;
+use std::str::FromStr;
 
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use uuid::Uuid;
@@ -13,6 +14,11 @@ impl Post {
     pub fn from_path(path: String) -> Result<Self, Box<dyn Error>> {
         let md_content = fs::read_to_string(&path)?;
         let meta = parse_meta(&md_content);
+
+        let post_id = match meta.get("id") {
+            None => { Uuid::new_v4() }
+            Some(id) => { Uuid::from_str(id.as_str()).expect("Invalid UUID String") }
+        };
 
         let title = match meta.get("title") {
             None => "Title Not Found".to_string(),
@@ -53,7 +59,7 @@ impl Post {
         };
 
         Ok(Post {
-            post_id: Uuid::new_v4(),
+            post_id,
             title,
             summary,
             content: md_content,
