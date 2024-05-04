@@ -16,9 +16,7 @@ function BlogPostCard({ post }: Props) {
     return (
 
         <div>
-            {/*todo: to be update*/ }
-            {/*<Link href={ `/blog/${ name }` }>*/ }
-            <Card as={ Link } href={ `/blog/post/${ post_id }` }>
+            <Card as={ Link } href={ `/blog/post/${ post_id }` } className={ `mx-7` }>
                 <CardHeader>
                     <p className={ 'font-bold' }>{ title }</p>
                 </CardHeader>
@@ -31,7 +29,6 @@ function BlogPostCard({ post }: Props) {
                     { last_update }
                 </CardBody>
             </Card>
-            {/*</Link>*/ }
         </div>
     );
 

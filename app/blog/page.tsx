@@ -11,7 +11,7 @@ async function Blog() {
             // blog list
             <ul className={ 'flex flex-col items-center w-full max-w-[1024px]' }>
                 { posts.map((post: JSON, key: React.Key | null | undefined) => (
-                    <li key={ key } className={ 'my-3.5 mx-7 w-[80%]' }>
+                    <li key={ key } className={ 'my-7 w-full' }>
                         <BlogPostCard post={ post } />
                     </li>)
                 ) }
