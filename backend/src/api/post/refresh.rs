@@ -49,11 +49,12 @@ pub async fn refresh(
         r##"
 CREATE TABLE IF NOT EXISTS Post
 (
-    post_id     UUID PRIMARY KEY,
-    title       VARCHAR(255) NOT NULL,
-    summary     TEXT         NOT NULL,
-    content     TEXT         NOT NULL,
-    last_update TIMESTAMP
+    post_id      UUID PRIMARY KEY,
+    title        VARCHAR(255) NOT NULL,
+    summary      TEXT         NOT NULL,
+    content      TEXT         NOT NULL,
+    last_update  TIMESTAMP,
+    first_update TIMESTAMP    NOT NULL
 );
     "##,
     )
@@ -81,13 +82,15 @@ CREATE TABLE IF NOT EXISTS Tag
         // table Post
         match query(
             r##"
-INSERT INTO Post (post_id, title, summary, content, last_update)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO Post (post_id, title, summary, content, last_update, first_update)
+VALUES ($1, $2, $3, $4, $5, $6)
 ON CONFLICT (post_id)
-    DO UPDATE SET title       = excluded.title,
-                  summary     = excluded.summary,
-                  content     = excluded.content,
-                  last_update = excluded.last_update
+    DO UPDATE SET title        = excluded.title,
+                  summary      = excluded.summary,
+                  content      = excluded.content,
+                  last_update  = excluded.last_update,
+                  first_update = excluded.first_update
+
         "##,
         )
             .bind(post.post_id)
@@ -95,6 +98,7 @@ ON CONFLICT (post_id)
             .bind(post.summary)
             .bind(&post.content)
             .bind(post.last_update)
+            .bind(post.first_update)
             .execute(&db_connection)
             .await
         {

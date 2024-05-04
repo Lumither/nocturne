@@ -12,6 +12,7 @@ pub struct Post {
     pub summary: String,
     pub content: String,
     pub last_update: NaiveDateTime,
+    pub first_update: NaiveDateTime,
 }
 
 

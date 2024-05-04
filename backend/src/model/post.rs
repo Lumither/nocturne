@@ -3,7 +3,7 @@ use std::error::Error;
 use std::process::Command;
 use std::str;
 
-use chrono::{NaiveDateTime, Utc};
+use chrono::{NaiveDate, NaiveDateTime, Utc};
 use uuid::Uuid;
 
 use crate::markdown::meta::parse_meta;
@@ -44,12 +44,21 @@ impl Post {
             Utc::now().naive_utc()
         };
 
+        let first_update: NaiveDateTime = match meta.get("date") {
+            None => Utc::now().naive_utc(),
+            Some(date) => NaiveDateTime::from(
+                NaiveDate::parse_from_str(date, "%Y-%m-%d%z")
+                    .expect("Failed to parse first_update time"),
+            ),
+        };
+
         Ok(Post {
             post_id: Uuid::new_v4(),
             title,
             summary,
             content: md_content,
             last_update,
+            first_update,
         })
     }
 }
