@@ -8,19 +8,26 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeRaw from 'rehype-raw';
 import remarkToc from 'remark-toc';
+import remarkFrontmatter from 'remark-frontmatter';
+import axios from 'axios';
 
 type Props = {
     id: string
 }
 
 async function Generate(props: Props) {
-    const response = await fetch(`${ process.env.BLOG_ENDPOINT }/posts/${ props.id }`);
-    if (!response.ok) {
-        throw new Error(response.statusText);
+    const response = await axios(`http://localhost:${ process.env.BACKEND_PORT }/api/get/post/${ props.id }`);
+    if (response.status !== 200) {
+        return (
+            <Card className={ `w-full max-w-[1024px]` }>
+                <CardBody>
+                    Fatal: Failed to load the post.
+                </CardBody>
+            </Card>
+        );
     }
-    const post_md = await response.text();
 
-    console.log(post_md);
+    let post_data = response.data;
 
     return (
         <div>
@@ -28,9 +35,9 @@ async function Generate(props: Props) {
                 <CardBody>
                     <Markdown
                         className={ `mx-5 my-5 max-w-none prose dark:prose-invert sm:prose-sm md:prose-sm lg:prose-lg` }
-                        remarkPlugins={ [ remarkGfm, remarkToc ] }
+                        remarkPlugins={ [ remarkGfm, remarkToc, remarkFrontmatter ] }
                         rehypePlugins={ [ rehypeHighlight, rehypeRaw, rehypeSanitize ] }
-                    >{ post_md }</Markdown>
+                    >{ (post_data as any)['content'] }</Markdown>
                 </CardBody>
 
             </Card>
