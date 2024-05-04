@@ -17,4 +17,8 @@ ON CONFLICT (post_id)
                   summary      = excluded.summary,
                   content      = excluded.content,
                   last_update  = excluded.last_update,
-                  first_update = excluded.first_update
+                  first_update = excluded.first_update;
+
+SELECT *
+FROM Post
+WHERE post_id = $1;

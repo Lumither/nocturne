@@ -6,3 +6,7 @@ CREATE TABLE IF NOT EXISTS Tag
 
 INSERT INTO Tag
 VALUES ($1, $2);
+
+SELECT *
+FROM Tag
+WHERE post_id = $1;
