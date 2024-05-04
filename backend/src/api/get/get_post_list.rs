@@ -8,10 +8,11 @@ use uuid::Uuid;
 pub async fn get_post_list(
     State(db_connection): State<PgPool>,
 ) -> Result<Json<Value>, Json<Value>> {
-    let post_list = sqlx::query("select post_id, title, summary, last_update from post")
-        .fetch_all(&db_connection)
-        .await
-        .unwrap();
+    let post_list =
+        sqlx::query("select post_id, title, summary, last_update, first_update from post")
+            .fetch_all(&db_connection)
+            .await
+            .unwrap();
 
     let mut res = Map::new();
     let posts: Vec<Value> = post_list
@@ -22,11 +23,13 @@ pub async fn get_post_list(
             let title: String = post.get("title");
             let summary: String = post.get("summary");
             let last_update: NaiveDateTime = post.get("last_update");
+            let first_update: NaiveDateTime = post.get("first_update");
 
             tmp.insert("post_id".to_string(), json!(post_id.to_string()));
             tmp.insert("title".to_string(), json!(title));
             tmp.insert("summary".to_string(), json!(summary));
             tmp.insert("last_update".to_string(), json!(last_update));
+            tmp.insert("first_update".to_string(), json!(first_update));
 
             Value::from(tmp)
         })
