@@ -1,3 +1,13 @@
+@import "lxgw-wenkai-webfont";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-family: "LXGW WenKai", sans-serif;
+}
+
+pre, code {
+    font-family: "LXGW WenKai Mono", sans-serif;
+}

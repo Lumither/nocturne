@@ -29,14 +29,12 @@ function BlogPostCard({ post }: Props) {
             >
                 { pic_url !== '' && <div className={ `w-full overflow-visible` }>
                     <Image
-                        // as={NextImage}
                         isZoomed
                         isBlurred
                         alt={ 'cover picture' }
                         src={ pic_url }
                         className={ `h-80 w-full object-cover` }
                         width={ `100%` }
-                        // removeWrapper
                     ></Image>
                 </div> }
 
@@ -44,7 +42,7 @@ function BlogPostCard({ post }: Props) {
                     <div className={ `flex flex-row justify-between` }>
                         <div className={ `mx-2 mt-2` }>
                             <Chip className={ `mb-2` } radius={ `sm` } color={ `secondary` }
-                                  variant={ `flat` }>{ category }</Chip>
+                                  variant={ `solid` }>{ category }</Chip>
                             <p className={ `text-4xl font-bold` }> { title }</p>
                             <p className={ `text-xl` }> { sub_title }</p>
                         </div>
