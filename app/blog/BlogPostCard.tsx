@@ -17,7 +17,9 @@ function BlogPostCard({ post }: Props) {
     // let last_update = new Date((post as any)['last_update']);
     let first_update = new Date((post as any)['first_update']);
     let post_id = (post as any)['post_id'];
-    let pic_url = (post as any)['pic_url'];
+    let header_img = (post as any)['header_img'];
+
+    console.log(header_img);
 
     return (
 
@@ -28,10 +30,10 @@ function BlogPostCard({ post }: Props) {
                   isHoverable
             >
 
-                { pic_url !== '' && <div className={ `w-full overflow-visible` }>
+                { header_img !== '' && <div className={ `w-full overflow-visible` }>
                     <Image
                         alt={ 'cover picture' }
-                        src={ pic_url }
+                        src={ header_img }
                         className={ `z-20 h-80 w-full object-cover rounded-b-none` }
                         style={ {
                             'maskImage': 'linear-gradient(black 95%, transparent)',
@@ -44,7 +46,7 @@ function BlogPostCard({ post }: Props) {
 
                 <CardBody className={ `overflow-visible` }>
                     <div className={ `flex flex-row justify-between` }>
-                        <div className={ `mx-2 ${ pic_url !== '' ? '-mt-8' : 'mt-2' }` }>
+                        <div className={ `mx-2 ${ header_img !== '' ? '-mt-8' : 'mt-2' }` }>
                             <Chip className={ `mb-2 z-30` } radius={ `sm` } color={ `secondary` }
                                   variant={ `solid` }>{ category }</Chip>
                             <p className={ `text-4xl font-bold` }> { title }</p>
@@ -54,11 +56,11 @@ function BlogPostCard({ post }: Props) {
                     </div>
                 </CardBody>
 
-             {/*   <CardBody className={ `transition-all duration-300 hidden group-hover:block` }>
-                    <div className={ `mx-2` }>
-                        <p>{ summary }</p>
-                    </div>
-                </CardBody>*/}
+                {/*   <CardBody className={ `transition-all duration-300 hidden group-hover:block` }>
+                 <div className={ `mx-2` }>
+                 <p>{ summary }</p>
+                 </div>
+                 </CardBody>*/ }
 
                 <CardFooter>
                     <div className={ `flex flex-row flex-wrap justify-between w-full` }>

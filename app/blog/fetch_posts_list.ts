@@ -7,5 +7,3 @@ export default async function fetch_posts_list(): Promise<any> {
     }
     return response.data;
 }
-
-
