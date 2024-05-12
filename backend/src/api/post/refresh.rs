@@ -59,8 +59,8 @@ pub async fn refresh(
         // table Post
         match query(
             r##"
-INSERT INTO Post (post_id, title, summary, content, last_update, first_update, sub_title)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO Post (post_id, title, summary, content, last_update, first_update, sub_title, category, header_img)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         "##,
         )
         .bind(Uuid::from_str(post["post_id"].as_str().unwrap()).unwrap())
@@ -94,6 +94,16 @@ VALUES ($1, $2, $3, $4, $5, $6, $7)
                 .and_then(|sub_title| sub_title.as_str())
                 .unwrap_or(""),
         )
+            .bind(
+                meta.get("category")
+                    .and_then(|category| category.as_str())
+                    .unwrap_or("N/A"),
+            )
+            .bind(
+                meta.get("header_img")
+                    .and_then(|header_img| header_img.as_str())
+                    .unwrap_or(""),
+            )
         .execute(&db_connection)
         .await
         {
