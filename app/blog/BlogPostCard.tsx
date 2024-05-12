@@ -23,32 +23,43 @@ function BlogPostCard({ post }: Props) {
 
         <div>
             <Card as={ Link } href={ `/blog/post/${ post_id }` }
-                  className={ `mx-7` }
+                  className={ `mx-7 group` }
                   isPressable
                   isHoverable
             >
+
                 { pic_url !== '' && <div className={ `w-full overflow-visible` }>
                     <Image
-                        isZoomed
-                        isBlurred
                         alt={ 'cover picture' }
                         src={ pic_url }
-                        className={ `h-80 w-full object-cover` }
+                        className={ `z-20 h-80 w-full object-cover rounded-b-none` }
+                        style={ {
+                            'maskImage': 'linear-gradient(black 95%, transparent)',
+                            'backdropFilter': 'blur(20px)'
+                        } }
                         width={ `100%` }
+                        removeWrapper
                     ></Image>
                 </div> }
 
-                <CardBody>
+                <CardBody className={ `overflow-visible` }>
                     <div className={ `flex flex-row justify-between` }>
-                        <div className={ `mx-2 mt-2` }>
-                            <Chip className={ `mb-2` } radius={ `sm` } color={ `secondary` }
+                        <div className={ `mx-2 ${ pic_url !== '' ? '-mt-8' : 'mt-2' }` }>
+                            <Chip className={ `mb-2 z-50` } radius={ `sm` } color={ `secondary` }
                                   variant={ `solid` }>{ category }</Chip>
                             <p className={ `text-4xl font-bold` }> { title }</p>
                             <p className={ `text-xl` }> { sub_title }</p>
                         </div>
-                        <MdNorthEast className={ `mt-4 mr-2` } size={ `40px` } />
+                        <MdNorthEast className={ `mt-1 mr-2` } size={ `40px` } />
                     </div>
                 </CardBody>
+
+             {/*   <CardBody className={ `transition-all duration-300 hidden group-hover:block` }>
+                    <div className={ `mx-2` }>
+                        <p>{ summary }</p>
+                    </div>
+                </CardBody>*/}
+
                 <CardFooter>
                     <div className={ `flex flex-row flex-wrap justify-between w-full` }>
                         <div>

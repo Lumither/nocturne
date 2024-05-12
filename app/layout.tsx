@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-        <body>
+        <body className={`dark:bg-[#282830]`}>
         <NextThemesProvider attribute="class" defaultTheme="dark">
             <Navbar />
             { children }
