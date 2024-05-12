@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use regex::Regex;
 
+/// return the meta info contained in the .md file front matter
 pub fn parse_meta(md_content: &str) -> HashMap<String, String> {
     let mut fields: HashMap<String, String> = HashMap::new();
     let match_regex = Regex::new(r"(?s)---\n(.*\n)---\n").unwrap();
@@ -41,11 +42,14 @@ mod meta_test {
 title: Hello World!
 tags: [ "test", "hello_world" ]
 ---
-            "##
+            "##,
         );
         dbg!(&parsed_meta);
         assert_eq!(parsed_meta.get("title"), Some(&"Hello World!".to_string()));
-        assert_eq!(parsed_meta.get("tags"), Some(&r#"[ "test", "hello_world" ]"#.to_string()));
+        assert_eq!(
+            parsed_meta.get("tags"),
+            Some(&r#"[ "test", "hello_world" ]"#.to_string())
+        );
         Ok(())
     }
 }

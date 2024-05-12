@@ -11,8 +11,9 @@ use crate::api::get::get_post_list::get_post_list;
 use crate::api::post::refresh::refresh;
 
 mod api;
-mod model;
+mod constants;
 mod markdown;
+mod model;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {

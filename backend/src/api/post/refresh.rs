@@ -1,14 +1,17 @@
 use std::env;
 use std::path::Path;
+use std::str::FromStr;
 
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::Json;
-use serde_json::{json, Value};
+use chrono::DateTime;
+use serde_json::{json, Map, Value};
 use sqlx::{PgPool, query};
+use uuid::Uuid;
 
-use crate::markdown::meta::parse_meta;
-use crate::model::Post;
+use crate::constants::GLOBAL_TIME_FORMAT;
+use crate::model::{post, POST_DB_MODEL, TAG_DB_MODEL};
 
 pub async fn refresh(
     State(db_connection): State<PgPool>,
@@ -40,67 +43,59 @@ pub async fn refresh(
 
     // generate new idx
 
-    let post_list: Vec<Post> = md_list
+    let post_list: Vec<Map<_, _>> = md_list
         .into_iter()
-        .map(|post| Post::from_path(post).unwrap())
+        .map(|post| post::from_path(post).unwrap())
         .collect();
 
-    query(
-        r##"
-CREATE TABLE IF NOT EXISTS Post
-(
-    post_id      UUID PRIMARY KEY,
-    title        VARCHAR(255) NOT NULL,
-    summary      TEXT         NOT NULL,
-    content      TEXT         NOT NULL,
-    last_update  TIMESTAMP,
-    first_update TIMESTAMP    NOT NULL
-);
-    "##,
-    )
-        .execute(&db_connection)
-        .await
-        .unwrap();
+    query(POST_DB_MODEL).execute(&db_connection).await.unwrap();
 
-    query(
-        r##"
-CREATE TABLE IF NOT EXISTS Tag
-(
-    post_id UUID         NOT NULL,
-    tag     VARCHAR(255) NOT NULL
-);
-    "##,
-    )
-        .execute(&db_connection)
-        .await
-        .unwrap();
+    query(TAG_DB_MODEL).execute(&db_connection).await.unwrap();
 
     // todo: concurrency
     for post in post_list {
-        let meta = parse_meta(&post.content);
+        let meta = &post["meta"];
 
         // table Post
         match query(
             r##"
-INSERT INTO Post (post_id, title, summary, content, last_update, first_update)
-VALUES ($1, $2, $3, $4, $5, $6)
-ON CONFLICT (post_id)
-    DO UPDATE SET title        = excluded.title,
-                  summary      = excluded.summary,
-                  content      = excluded.content,
-                  last_update  = excluded.last_update,
-                  first_update = excluded.first_update
-
+INSERT INTO Post (post_id, title, summary, content, last_update, first_update, sub_title)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
         "##,
         )
-            .bind(post.post_id)
-            .bind(post.title)
-            .bind(post.summary)
-            .bind(&post.content)
-            .bind(post.last_update)
-            .bind(post.first_update)
-            .execute(&db_connection)
-            .await
+        .bind(Uuid::from_str(post["post_id"].as_str().unwrap()).unwrap())
+        .bind(post["title"].as_str())
+        .bind(
+            post.get("summary")
+                .and_then(|summary| summary.as_str())
+                .unwrap_or(""),
+        )
+        .bind(post["content"].as_str())
+        .bind(
+            DateTime::parse_from_str(
+                post["last_update"]
+                    .as_str()
+                    .expect("Failed to parse `last_update`"),
+                GLOBAL_TIME_FORMAT,
+            )
+            .expect("Failed to convert `last_update` to NaiveDateTime"),
+        )
+        .bind(
+            DateTime::parse_from_str(
+                post["first_update"]
+                    .as_str()
+                    .expect("Failed to parse `first_update`"),
+                GLOBAL_TIME_FORMAT,
+            )
+            .expect("Failed to convert `first_update` to NaiveDateTime"),
+        )
+        .bind(
+            meta.get("sub_title")
+                .and_then(|sub_title| sub_title.as_str())
+                .unwrap_or(""),
+        )
+        .execute(&db_connection)
+        .await
         {
             Ok(_) => {}
             Err(e) => {
@@ -114,7 +109,7 @@ ON CONFLICT (post_id)
         // table Tag
         if let Some(tags_string) = meta.get("tags").to_owned() {
             // parse tags string
-            let parsed: Value = serde_json::from_str(tags_string).unwrap();
+            let parsed: Value = serde_json::from_str(tags_string.as_str().unwrap()).unwrap();
             let string_array = parsed.as_array().unwrap();
             let tags: Vec<String> = string_array
                 .iter()
@@ -128,10 +123,10 @@ INSERT INTO Tag
 VALUES ($1, $2); 
                     "#,
                 )
-                    .bind(post.post_id)
-                    .bind(tag)
-                    .execute(&db_connection)
-                    .await
+                .bind(Uuid::from_str(post["post_id"].as_str().unwrap()).unwrap())
+                .bind(tag)
+                .execute(&db_connection)
+                .await
                 {
                     Ok(_) => {}
                     Err(e) => {

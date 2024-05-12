@@ -1,6 +1,6 @@
 use axum::extract::State;
 use axum::Json;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use serde_json::{json, Map, Value};
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
@@ -22,8 +22,8 @@ pub async fn get_post_list(
             let post_id: Uuid = post.get("post_id");
             let title: String = post.get("title");
             let summary: String = post.get("summary");
-            let last_update: NaiveDateTime = post.get("last_update");
-            let first_update: NaiveDateTime = post.get("first_update");
+            let last_update: DateTime<Utc> = post.get("last_update");
+            let first_update: DateTime<Utc> = post.get("first_update");
 
             tmp.insert("post_id".to_string(), json!(post_id.to_string()));
             tmp.insert("title".to_string(), json!(title));

@@ -3,7 +3,7 @@ use std::str::FromStr;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::Json;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use serde_json::{json, Map, Value};
 use sqlx::{Error, PgPool, query, Row};
 use uuid::Uuid;
@@ -19,42 +19,34 @@ FROM Post
 WHERE post_id = $1;
     "#,
     )
-        .bind(Uuid::from_str(post_id.as_str()).expect("Failed to parse UUID"))
-        .fetch_one(&db_connection)
-        .await {
-        Ok(value) => { value }
+    .bind(Uuid::from_str(post_id.as_str()).expect("Failed to parse UUID"))
+    .fetch_one(&db_connection)
+    .await
+    {
+        Ok(value) => value,
         Err(e) => {
             return match e {
-                Error::RowNotFound => {
-                    Err((
-                        StatusCode::BAD_REQUEST,
-                        Json::from(json!(format!(
-                    "{{error: {}}}",
-                    e.to_string()
-                )))))
-                }
-                _ => {
-                    Err((
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        Json::from(json!(format!(
-                    "{{error: {}}}",
-                    e.to_string()
-                )))))
-                }
+                Error::RowNotFound => Err((
+                    StatusCode::BAD_REQUEST,
+                    Json::from(json!(format!("{{error: {}}}", e.to_string()))),
+                )),
+                _ => Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json::from(json!(format!("{{error: {}}}", e.to_string()))),
+                )),
             };
         }
     };
-
 
     let tags = query(
         r#"
 SELECT tag FROM Tag WHERE post_id = $1;
     "#,
     )
-        .bind(Uuid::from_str(post_id.as_str()).expect("Failed to parse UUID"))
-        .fetch_all(&db_connection)
-        .await
-        .expect("Failed to execute db query");
+    .bind(Uuid::from_str(post_id.as_str()).expect("Failed to parse UUID"))
+    .fetch_all(&db_connection)
+    .await
+    .expect("Failed to execute db query");
 
     let mut res = Map::new();
 
@@ -72,11 +64,11 @@ SELECT tag FROM Tag WHERE post_id = $1;
     );
     res.insert(
         "last_update".to_string(),
-        json!(meta.get::<NaiveDateTime, &str>("last_update")),
+        json!(meta.get::<DateTime<Utc>, &str>("last_update")),
     );
     res.insert(
         "first_update".to_string(),
-        json!(meta.get::<NaiveDateTime, &str>("first_update")),
+        json!(meta.get::<DateTime<Utc>, &str>("first_update")),
     );
 
     let tags: Vec<String> = tags
