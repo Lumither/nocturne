@@ -45,7 +45,7 @@ function BlogPostCard({ post }: Props) {
                 <CardBody className={ `overflow-visible` }>
                     <div className={ `flex flex-row justify-between` }>
                         <div className={ `mx-2 ${ pic_url !== '' ? '-mt-8' : 'mt-2' }` }>
-                            <Chip className={ `mb-2 z-50` } radius={ `sm` } color={ `secondary` }
+                            <Chip className={ `mb-2 z-30` } radius={ `sm` } color={ `secondary` }
                                   variant={ `solid` }>{ category }</Chip>
                             <p className={ `text-4xl font-bold` }> { title }</p>
                             <p className={ `text-xl` }> { sub_title }</p>
