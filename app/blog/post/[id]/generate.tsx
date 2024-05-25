@@ -19,7 +19,7 @@ async function Generate(props: Props) {
     const response = await axios(`http://localhost:${ process.env.BACKEND_PORT }/api/get/post/${ props.id }`);
     if (response.status !== 200) {
         return (
-            <Card className={ `w-full max-w-[1024px]` }>
+            <Card className={ `w-full` }>
                 <CardBody>
                     Fatal: Failed to load the post.
                 </CardBody>
@@ -31,10 +31,10 @@ async function Generate(props: Props) {
 
     return (
         <div>
-            <Card className={ `w-full max-w-[1024px]` }>
+            <Card className={ `w-full` }>
                 <CardBody>
                     <Markdown
-                        className={ `mx-5 my-5 max-w-none prose dark:prose-invert sm:prose-sm md:prose-sm lg:prose-lg` }
+                        className={ `mx-5 my-5 max-w-none prose dark:prose-invert sm:prose-sm md:prose-md lg:prose-lg` }
                         remarkPlugins={ [ remarkGfm, remarkToc, remarkFrontmatter ] }
                         rehypePlugins={ [ rehypeHighlight, rehypeRaw, rehypeSanitize ] }
                     >{ (post_data as any)['content'] }</Markdown>

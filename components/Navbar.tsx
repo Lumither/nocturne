@@ -1,33 +1,50 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { Button, Image } from '@nextui-org/react';
 import {
-    Image,
-    Navbar as NextUINavbar,
-    NavbarBrand,
-    NavbarContent,
-    NavbarItem,
-    NavbarMenu,
-    NavbarMenuItem,
-    NavbarMenuToggle
-} from '@nextui-org/react';
+    IoFileTrayFull,
+    IoHome,
+    IoInformationCircle,
+    IoLogoGithub,
+    IoMail,
+    IoPencil,
+    IoPricetags,
+    IoSearch
+} from 'react-icons/io5';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 
-
-const entries: { display_name: string; href: string; }[] = [
+const entries: { display_name: string; href: string; icon: React.ReactNode }[] = [
     {
+        icon: <IoHome size={ `20px` }></IoHome>,
         display_name: 'Home',
         href: '/'
     },
     {
+        icon: <IoInformationCircle size={ `20px` }></IoInformationCircle>,
         display_name: 'About',
         href: '/about'
     },
     {
+        icon: <IoPencil size={ `20px` }></IoPencil>,
         display_name: 'Blog',
         href: '/blog'
+    },
+    {
+        icon: <IoPricetags size={ `20px` }></IoPricetags>,
+        display_name: 'Tags',
+        href: '/tags'
+    },
+    {
+        icon: <IoFileTrayFull size={ `20px` }></IoFileTrayFull>,
+        display_name: 'Archive',
+        href: '/Archive'
+    },
+    {
+        icon: <IoSearch size={ `20px` }></IoSearch>,
+        display_name: 'Search',
+        href: '/search'
     }
 ];
 
@@ -48,67 +65,62 @@ function Navbar() {
 
     return (
         <>
-            <NextUINavbar isBlurred isBordered>
-
-                <NavbarContent className="sm:hidden" justify="start">
-                    <NavbarMenuToggle />
-                </NavbarContent>
-
-                <NavbarContent className="sm:hidden pr-3" justify="center">
+            <div className={ `flex flex-col w-full max-w-[256px] mr-2 ml-8 min-h-screen pt-8 sticky` }>
+                <div className={ `flex justify-center items-center my-7` }>
                     <Image
                         src={ 'https://avatars.githubusercontent.com/u/46409277?v=4' }
                         alt={ 'avatar' }
-                        className={ 'rounded-full h-[3rem]' }
+                        width={ 200 }
+                        height={ 200 }
+                        className={ 'rounded-full justify-self-center' }
+                        removeWrapper
                     ></Image>
+                </div>
 
-                    <NavbarBrand>
-                        <p className="font-bold text-inherit">{ 'Lumither\'s site' }</p>
-                    </NavbarBrand>
-                </NavbarContent>
+                <p className={ `font-bold text-2xl` }>Lumither Tao</p>
+                <p className={ `text-xl text-zinc-500 dark:text-zinc-400` }>Ad Astra</p>
 
-                <NavbarContent className="hidden sm:flex gap-4" justify="center">
-                    <Image
-                        src={ 'https://avatars.githubusercontent.com/u/46409277?v=4' }
-                        alt={ 'avatar' }
-                        className={ 'rounded-full h-[3rem]' }
-                    ></Image>
+                <div className={ `flex flex-row items-center my-4 space-x-2` }>
+                    <Link href={ 'https://github.com/Lumither' } aria-label={ `GitHub` }>
+                        <IoLogoGithub size={ `30px` } />
+                    </Link>
+                    <Link href={ 'mailto:lumither@outlook.com' } aria-label={ `email` }>
+                        <IoMail size={ `30px` } />
+                    </Link>
+                </div>
 
-                    <NavbarBrand>
-                        <p className="font-bold text-inherit">{ 'Lumither\'s site' }</p>
-                    </NavbarBrand>
+                <div
+                    className={ `mt-8 -ml-3` }>
+                    <ul className={ `flex flex-col space-y-2` }>
+                        {
+                            entries.map((meta, key) => (
+                                <li key={ key }>
+                                    <Button startContent={ meta.icon }
+                                            as={ Link }
+                                            variant={ `light` }
+                                            color={ `default` }
+                                            fullWidth
+                                            className={ 'flex justify-start' }
+                                        // className={ `w-full` }
+                                            aria-label={ `navbar: ${ meta.display_name }` }
+                                            href={ meta.href }>
+                                        <p className={ `font-bold` }>{ meta.display_name }</p>
+                                    </Button>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
 
-                    { entries.map((item, index) => (
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        <NavbarItem key={ index } isActive={ usePathname() === item.href }>
-                            <Link
-                                className="w-full"
-                                href={ item.href }
-                            >
-                                { item.display_name }
-                            </Link>
-                        </NavbarItem>
-                    )) }
-                </NavbarContent>
-
-                <NavbarContent justify="end">
-                    <NavbarItem>
+                <div
+                    className={ `absolute bottom-0 mb-8` }
+                >
+                    <div className={ `flex flex-row justify-center` }>
                         <ThemeSwitcher />
-                    </NavbarItem>
-                </NavbarContent>
-
-                <NavbarMenu>
-                    { entries.map((item, index) => (
-                        <NavbarMenuItem key={ index }>
-                            <Link
-                                className="w-full"
-                                href={ item.href }
-                            >
-                                { item.display_name }
-                            </Link>
-                        </NavbarMenuItem>
-                    )) }
-                </NavbarMenu>
-            </NextUINavbar>
+                        <p className={ `font-bold` }>{ `Toggle Theme` }</p>
+                    </div>
+                </div>
+            </div>
         </>
     );
 }

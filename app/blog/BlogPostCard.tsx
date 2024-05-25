@@ -23,7 +23,7 @@ function BlogPostCard({ post }: Props) {
 
     return (
 
-        <div>
+        <div className={ `w-full` }>
             <Card as={ Link } href={ `/blog/post/${ post_id }` }
                   className={ `mx-7 group` }
                   isPressable

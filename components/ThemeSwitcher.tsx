@@ -21,6 +21,7 @@ function ThemeSwitcher() {
         <div>
             <Switch
                 color={ 'default' }
+                aria-label={ `theme switch` }
                 startContent={ <MdOutlineLightMode /> }
                 endContent={ <MdOutlineDarkMode /> }
                 onValueChange={ (isSelected) => {

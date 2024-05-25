@@ -17,10 +17,14 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-        <body className={`dark:bg-[#282830]`}>
+        <body className={ `dark:bg-[#282830] min-h-screen` }>
         <NextThemesProvider attribute="class" defaultTheme="dark">
-            <Navbar />
-            { children }
+            <div className={ `justify-center flex flex-row w-full` }>
+                <Navbar />
+                <div className={ `flex-auto max-w-[1024px]` }>
+                    { children }
+                </div>
+            </div>
         </NextThemesProvider>
         </body>
         </html>
