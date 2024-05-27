@@ -18,20 +18,23 @@ function ThemeSwitcher() {
     }
 
     return (
-        <div>
-            <Switch
-                color={ 'default' }
-                aria-label={ `theme switch` }
-                startContent={ <MdOutlineLightMode /> }
-                endContent={ <MdOutlineDarkMode /> }
-                onValueChange={ (isSelected) => {
-                    if (isSelected) {
-                        setTheme('light');
-                    } else {
-                        setTheme('dark');
-                    }
-                } }
-            ></Switch>
+        <div className={ `` }>
+            <div className={ `flex flex-row items-center` }>
+                <Switch
+                    color={ 'default' }
+                    aria-label={ `theme switch` }
+                    startContent={ <MdOutlineLightMode /> }
+                    endContent={ <MdOutlineDarkMode /> }
+                    onValueChange={ (isSelected) => {
+                        if (isSelected) {
+                            setTheme('light');
+                        } else {
+                            setTheme('dark');
+                        }
+                    } }
+                ></Switch>
+                <p className={ `font-bold` }>{ `Toggle Theme` }</p>
+            </div>
         </div>
     );
 }

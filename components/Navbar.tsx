@@ -65,59 +65,59 @@ function Navbar() {
 
     return (
         <>
-            <div className={ `flex flex-col w-full max-w-[256px] mr-2 ml-8 min-h-screen pt-8 sticky` }>
-                <div className={ `flex justify-center items-center my-7` }>
-                    <Image
-                        src={ 'https://avatars.githubusercontent.com/u/46409277?v=4' }
-                        alt={ 'avatar' }
-                        width={ 200 }
-                        height={ 200 }
-                        className={ 'rounded-full justify-self-center' }
-                        removeWrapper
-                    ></Image>
-                </div>
+            <div
+                className={ `flex flex-col w-full max-w-[256px] mr-2 ml-8 min-h-screen max-h-screen pt-8 sticky` }>
+                <div className={ `fixed min-h-screen h-full` }>
+                    <div className={ `flex justify-center items-center my-7` }>
+                        <Image
+                            src={ 'https://avatars.githubusercontent.com/u/46409277?v=4' }
+                            alt={ 'avatar' }
+                            width={ 200 }
+                            height={ 200 }
+                            className={ 'rounded-full justify-self-center' }
+                            removeWrapper
+                        ></Image>
+                    </div>
 
-                <p className={ `font-bold text-2xl` }>Lumither Tao</p>
-                <p className={ `text-xl text-zinc-500 dark:text-zinc-400` }>Ad Astra</p>
+                    <p className={ `font-bold text-2xl` }>Lumither Tao</p>
+                    <p className={ `text-xl text-zinc-500 dark:text-zinc-400` }>Ad Astra</p>
 
-                <div className={ `flex flex-row items-center my-4 space-x-2` }>
-                    <Link href={ 'https://github.com/Lumither' } aria-label={ `GitHub` }>
-                        <IoLogoGithub size={ `30px` } />
-                    </Link>
-                    <Link href={ 'mailto:lumither@outlook.com' } aria-label={ `email` }>
-                        <IoMail size={ `30px` } />
-                    </Link>
-                </div>
+                    <div className={ `flex flex-row items-center my-4 space-x-2` }>
+                        <Link href={ 'https://github.com/Lumither' } aria-label={ `GitHub` }>
+                            <IoLogoGithub size={ `30px` } />
+                        </Link>
+                        <Link href={ 'mailto:lumither@outlook.com' } aria-label={ `email` }>
+                            <IoMail size={ `30px` } />
+                        </Link>
+                    </div>
 
-                <div
-                    className={ `mt-8 -ml-3` }>
-                    <ul className={ `flex flex-col space-y-2` }>
-                        {
-                            entries.map((meta, key) => (
-                                <li key={ key }>
-                                    <Button startContent={ meta.icon }
-                                            as={ Link }
-                                            variant={ `light` }
-                                            color={ `default` }
-                                            fullWidth
-                                            className={ 'flex justify-start' }
-                                        // className={ `w-full` }
-                                            aria-label={ `navbar: ${ meta.display_name }` }
-                                            href={ meta.href }>
-                                        <p className={ `font-bold` }>{ meta.display_name }</p>
-                                    </Button>
-                                </li>
-                            ))
-                        }
-                    </ul>
-                </div>
+                    <div
+                        className={ `mt-8 -ml-3` }>
+                        <ul className={ `flex flex-col space-y-2` }>
+                            {
+                                entries.map((meta, key) => (
+                                    <li key={ key }>
+                                        <Button startContent={ meta.icon }
+                                                as={ Link }
+                                                variant={ `light` }
+                                                color={ `default` }
+                                                fullWidth
+                                                className={ 'flex justify-start' }
+                                            // className={ `w-full` }
+                                                aria-label={ `navbar: ${ meta.display_name }` }
+                                                href={ meta.href }>
+                                            <p className={ `font-bold` }>{ meta.display_name }</p>
+                                        </Button>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </div>
 
-                <div
-                    className={ `absolute bottom-0 mb-8` }
-                >
-                    <div className={ `flex flex-row justify-center` }>
+                    <div
+                        className={ `absolute bottom-8 mb-8` }
+                    >
                         <ThemeSwitcher />
-                        <p className={ `font-bold` }>{ `Toggle Theme` }</p>
                     </div>
                 </div>
             </div>
