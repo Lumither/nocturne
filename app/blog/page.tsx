@@ -1,6 +1,7 @@
 import React from 'react';
 import fetch_posts_list from '@/app/blog/fetch_posts_list';
 import BlogPostCard from '@/app/blog/BlogPostCard';
+import { Card, CardBody } from '@nextui-org/card';
 
 async function Blog() {
 
@@ -9,9 +10,9 @@ async function Blog() {
         let posts = res['posts'];
         return (
             // blog list
-            <ul className={ 'flex flex-col items-center w-full' }>
+            <ul className={ 'flex flex-col items-center w-full space-y-7' }>
                 { posts.map((post: JSON, key: React.Key | null | undefined) => (
-                    <li key={ key } className={ 'my-7 w-full' }>
+                    <li key={ key } className={ 'w-full' }>
                         <BlogPostCard post={ post } />
                     </li>)
                 ) }
@@ -19,10 +20,11 @@ async function Blog() {
         );
     } catch (e: any) {
         return (
-            <>
-                { e.toString() }
-            </>
-        );
+            <Card className={ `w-full` }>
+                <CardBody>
+                    Fatal: Failed to load post list.
+                </CardBody>
+            </Card>);
     }
 
 }

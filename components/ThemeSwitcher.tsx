@@ -33,7 +33,7 @@ function ThemeSwitcher() {
                         }
                     } }
                 ></Switch>
-                <p className={ `font-bold` }>{ `Toggle Theme` }</p>
+                <p className={ `font-bold hidden md:block` }>{ `Toggle Theme` }</p>
             </div>
         </div>
     );

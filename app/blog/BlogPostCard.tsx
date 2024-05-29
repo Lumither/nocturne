@@ -19,13 +19,11 @@ function BlogPostCard({ post }: Props) {
     let post_id = (post as any)['post_id'];
     let header_img = (post as any)['header_img'];
 
-    console.log(header_img);
-
     return (
 
         <div className={ `w-full` }>
             <Card as={ Link } href={ `/blog/post/${ post_id }` }
-                  className={ `mx-7 group` }
+                  className={ `group` }
                   isPressable
                   isHoverable
             >
