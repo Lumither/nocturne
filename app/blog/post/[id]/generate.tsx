@@ -35,10 +35,10 @@ async function Generate(props: Props) {
 
     return (
         <div>
-            <Card className={ `w-full` }>
+            <Card className={ `w-full max-w-full relative` }>
                 <CardBody>
                     <Markdown
-                        className={ `p-5 max-w-prose text-justify text-pretty会 prose prose-sm dark:prose-invert md:prose-md lg:prose-lg` }
+                        className={ `p-5 max-w-full text-justify text-pretty会 prose prose-sm dark:prose-invert md:prose-md lg:prose-lg` }
                         remarkPlugins={ [ remarkGfm, remarkToc, remarkFrontmatter ] }
                         rehypePlugins={ [ rehypeHighlight, rehypeRaw, rehypeSanitize ] }
                     >{ (post_data as any)['content'] }</Markdown>

@@ -110,7 +110,7 @@ function Navbar() {
     return (
         <>
             <div
-                className={ `flex flex-col w-auto md:w-full min-w-[50px] max-w-[256px] mr-2 ml-8 min-h-screen max-h-screen pt-8 sticky` }>
+                className={ `flex flex-col w-auto md:w-full min-w-[50px] max-w-[256px] mr-0 md:mr-2 ml-2 md:ml-8 min-h-dvh pt-8 sticky` }>
                 <div className={ `fixed min-h-screen h-full` }>
                     <div className={ `hidden md:block` }>
                         <div className={ `flex justify-center items-center my-7` }>
@@ -153,7 +153,7 @@ function Navbar() {
                     </div>
 
                     <div
-                        className={ `mt-8 ml-0 md:-ml-3` }>
+                        className={ `flex justify-center md:justify-start mt-8 ml-0 md:-ml-3` }>
                         <ul className={ `flex flex-col space-y-2` }>
                             {
                                 entries.map((meta, key) => (
@@ -176,8 +176,8 @@ function Navbar() {
                         </ul>
                     </div>
 
-                    <div className={ `mt-8 md:hidden` }>
-                        <p className={ `sideways-lr font-bold text-2xl text-zinc-500 dark:text-zinc-400` }>
+                    <div className={ `mt-8 flex md:hidden justify-center w-full` }>
+                        <p className={ `text-center sideways-lr font-bold text-2xl text-zinc-500 dark:text-zinc-400` }>
                             { shownPath }
                         </p>
                     </div>
