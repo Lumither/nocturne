@@ -3,6 +3,7 @@ import './globals.css';
 import React from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 
 export const metadata: Metadata = {
@@ -21,8 +22,9 @@ export default function RootLayout({
         <NextThemesProvider attribute="class" defaultTheme="dark">
             <div className={ `justify-center flex flex-row w-full` }>
                 <Navbar />
-                <div className={ `flex-auto max-w-[1024px]` }>
+                <div className={ `flex flex-col flex-auto max-w-[1024px]` }>
                     { children }
+                    <Footer />
                 </div>
             </div>
         </NextThemesProvider>
