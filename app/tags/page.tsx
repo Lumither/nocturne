@@ -1,9 +1,10 @@
 import React from 'react';
+import ConstructionPlaceHolder from '@/components/ConstructionPlaceHolder';
 
 const Tags = () => {
     return (
-        <div>
-
+        <div className={ `h-dvh` }>
+            <ConstructionPlaceHolder />
         </div>
     );
 };

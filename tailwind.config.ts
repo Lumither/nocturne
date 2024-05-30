@@ -45,10 +45,12 @@ const config: Config = {
                         writingMode: 'vertical-lr'
                     },
                     '.sideways-lr': {
-                        writingMode: 'sideways-lr'
+                        writingMode: 'vertical-lr',
+                        transform: 'rotate(180deg)'
                     },
                     '.sideways-rl': {
-                        writingMode: 'sideways-rl'
+                        writingMode: 'sideways-rl',
+                        transform: 'rotate(180deg)'
                     }
                 }
             );

@@ -1,7 +1,12 @@
+import ConstructionPlaceHolder from '@/components/ConstructionPlaceHolder';
+import React from 'react';
+
 export default function Home() {
     return (
         <main>
-            {/*<ThemeSwitcher />*/ }
+            <div className={ `h-dvh` }>
+                <ConstructionPlaceHolder />
+            </div>
         </main>
     );
 }

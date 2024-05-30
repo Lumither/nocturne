@@ -153,8 +153,8 @@ function Navbar() {
                     </div>
 
                     <div
-                        className={ `flex justify-center md:justify-start mt-8 ml-0 md:-ml-3` }>
-                        <ul className={ `flex flex-col space-y-2` }>
+                        className={ `flex justify-center md:justify-start w-full mt-8 ml-0 md:-ml-3` }>
+                        <ul className={ `flex flex-col space-y-2 w-full` }>
                             {
                                 entries.map((meta, key) => (
                                     <li key={ key }>
