@@ -1,4 +1,4 @@
-@import "lxgw-wenkai-webfont";
+@import "lxgw-wenkai-webfont/style.css";
 
 @tailwind base;
 @tailwind components;

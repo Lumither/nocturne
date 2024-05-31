@@ -115,7 +115,7 @@ function Navbar() {
                     <div className={ `hidden md:block` }>
                         <div className={ `flex justify-center items-center my-7` }>
                             <Image
-                                src={ 'https://avatars.githubusercontent.com/u/46409277?v=4' }
+                                src={ 'https://oss.lumither.com/blog/pictures/compr/1717153492846703409_avatar.webp' }
                                 alt={ 'avatar' }
                                 width={ 200 }
                                 height={ 200 }
