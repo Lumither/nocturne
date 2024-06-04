@@ -1,5 +1,3 @@
-'use server';
-
 import React from 'react';
 import Markdown from 'react-markdown';
 import { Card, CardBody } from '@nextui-org/card';
@@ -19,7 +17,7 @@ async function Generate(props: Props) {
 
     let response: any;
     try {
-        response = await axios(`http://localhost:${ process.env.BACKEND_PORT }/api/get/post/${ props.id }`);
+        response = await axios(`${ process.env.BACKEND_URL }/get_post/${ props.id }`);
     } catch (e) {
         return (
             <Card className={ `w-full` }>
@@ -38,7 +36,7 @@ async function Generate(props: Props) {
             <Card className={ `w-full max-w-full relative` }>
                 <CardBody>
                     <Markdown
-                        className={ `p-5 max-w-full text-justify text-pretty会 prose prose-sm dark:prose-invert md:prose-md lg:prose-lg` }
+                        className={ `p-5 max-w-full text-justify text-pretty prose prose-sm dark:prose-invert md:prose-md lg:prose-lg` }
                         remarkPlugins={ [ remarkGfm, remarkToc, remarkFrontmatter ] }
                         rehypePlugins={ [ rehypeHighlight, rehypeRaw, rehypeSanitize ] }
                     >{ (post_data as any)['content'] }</Markdown>

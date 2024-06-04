@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button, Image } from '@nextui-org/react';
+import NextImage from 'next/image';
 import {
     IoFileTrayFull,
     IoHome,
@@ -115,11 +116,13 @@ function Navbar() {
                     <div className={ `hidden md:block` }>
                         <div className={ `flex justify-center items-center my-7` }>
                             <Image
+                                as={ NextImage }
                                 src={ 'https://oss.lumither.com/blog/pictures/compr/1717153492846703409_avatar.webp' }
                                 alt={ 'avatar' }
                                 width={ 200 }
                                 height={ 200 }
                                 className={ 'rounded-full justify-self-center' }
+                                fetchPriority={ 'high' }
                                 removeWrapper
                             ></Image>
                         </div>

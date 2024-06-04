@@ -32,9 +32,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .expect("failed to load database");
 
     let app = Router::new()
-        .route("/api/post/refresh", post(refresh))
-        .route("/api/get/post_list", get(get_post_list))
-        .route("/api/get/post/:post_id", get(get_post))
+        .route("/refresh_posts", post(refresh))
+        .route("/get_post_list", get(get_post_list))
+        .route("/get_post/:post_id", get(get_post))
         .with_state(db_pool);
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await?;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardBody, CardFooter } from '@nextui-org/card';
 import { Chip, Image } from '@nextui-org/react';
+import NextImage from 'next/image';
 import Link from 'next/link';
 import { MdCalendarMonth, MdNorthEast } from 'react-icons/md';
 
@@ -28,16 +29,18 @@ function BlogPostCard({ post }: Props) {
                   isHoverable
             >
 
-                { header_img !== '' && <div className={ `w-full overflow-visible` }>
+
+                { header_img !== '' && <div className={ `w-full overflow h-80 relative` }>
                     <Image
+                        as={ NextImage }
                         alt={ 'cover picture' }
                         src={ header_img }
-                        className={ `z-20 h-80 w-full object-cover rounded-b-none` }
+                        className={ `w-full object-cover rounded-b-none` }
                         style={ {
                             'maskImage': 'linear-gradient(black 95%, transparent)',
                             'backdropFilter': 'blur(20px)'
                         } }
-                        width={ `100%` }
+                        fill
                         removeWrapper
                     ></Image>
                 </div> }
