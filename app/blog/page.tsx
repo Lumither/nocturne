@@ -2,6 +2,7 @@ import React from 'react';
 import fetch_posts_list from '@/app/blog/fetch_posts_list';
 import BlogPostCard from '@/app/blog/BlogPostCard';
 import { Card, CardBody } from '@nextui-org/card';
+import { MotionDiv } from '@/app/public/MotionDiv';
 
 async function Blog() {
 
@@ -11,9 +12,15 @@ async function Blog() {
         return (
             // blog list
             <ul className={ 'flex flex-col items-center w-full space-y-7' }>
-                { posts.map((post: JSON, key: React.Key | null | undefined) => (
+                { posts.map((post: JSON, key: number) => (
                     <li key={ key } className={ 'w-full' }>
-                        <BlogPostCard post={ post } />
+                        <MotionDiv
+                            initial={ { y: 20, opacity: 0 } }
+                            animate={ { y: 0, opacity: 1 } }
+                            transition={ { ease: 'easeInOut', duration: 0.5, delay: key * .2 + .25 } }
+                        >
+                            <BlogPostCard post={ post } />
+                        </MotionDiv>
                     </li>)
                 ) }
             </ul>
