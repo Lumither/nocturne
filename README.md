@@ -15,3 +15,22 @@ Build with Next.js, Rust with passion and love www
 
     <todo>
 
+## Todos:
+
+### Backend
+
+- [ ] Add: log system
+- [ ] Add: search api
+- [ ] Add: tag filter (api)
+- [ ] Abandon: UUID mechanism
+- [ ] Fix: db connection issue
+
+### Frontend
+
+- [ ] Page: Home
+- [ ] Page: About
+- [ ] Page: Tags
+- [ ] Page: Archive
+- [ ] Page: Search
+- [ ] Add: Right sidebar
+
