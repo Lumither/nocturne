@@ -12,13 +12,21 @@ if [ -z "$GIT_WORK_DIR" ]; then
   exit 1
 fi
 
+if [ -z "$BACKEND_PORT" ]; then
+  echo "BACKEND_PORT is not set in the .env file"
+  exit 1
+fi
+
 check_for_updates() {
   cd "$GIT_WORK_DIR" || exit
   res=$(git pull)
   if echo "$res" | grep -q "Already up to date"; then
     echo "Repo is up to date."
   else
-    echo "Repo has updated"
+    echo "Repo has updated; calling db update"
+    curl --request POST -sL \
+         --url "localhost:$BACKEND_PORT"
+    #todo: to be continued
   fi
   }
 
