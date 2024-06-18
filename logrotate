@@ -1,0 +1,8 @@
+/var/log/nocturne/*.log {
+        size 20K
+        compress
+        rotate 10
+        missingok
+        copytruncate
+        delaycompress
+}
