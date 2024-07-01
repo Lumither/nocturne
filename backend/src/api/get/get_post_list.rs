@@ -1,11 +1,9 @@
-use axum::extract::State;
-use axum::http::StatusCode;
-use axum::Json;
+use axum::{extract::State, http::StatusCode, Json};
 use chrono::{DateTime, Utc};
 use futures::future::join_all;
 use serde_json::{json, Map, Value};
-use sqlx::{PgPool, query, Row};
-use sqlx::postgres::PgRow;
+use sqlx::{postgres::PgRow, query, PgPool, Row};
+use tracing::error;
 use uuid::Uuid;
 
 pub async fn get_post_list(
@@ -15,8 +13,20 @@ pub async fn get_post_list(
         "select post_id, title, sub_title, summary, last_update, first_update, header_img, category from post",
     )
         .fetch_all(&db_connection)
-        .await
-        .unwrap();
+        .await;
+    let post_list = match post_list {
+        Ok(post_list) => post_list,
+        Err(e) => {
+            error!(
+                "Database query error on fetching post list: {}",
+                e.to_string()
+            );
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json::from(json!(("error", e.to_string()))),
+            ));
+        }
+    };
 
     let mut res = Map::new();
     let posts: Vec<_> = post_list

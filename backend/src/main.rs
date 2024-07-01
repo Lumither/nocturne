@@ -4,11 +4,11 @@ use std::num::ParseIntError;
 use std::process::exit;
 use std::str::FromStr;
 
-use axum::Router;
 use axum::routing::{get, post};
+use axum::Router;
 use dotenv::dotenv;
-use sqlx::ConnectOptions;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
+use sqlx::ConnectOptions;
 use tracing::{error, warn};
 
 use crate::api::get::get_post::get_post;

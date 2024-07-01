@@ -8,6 +8,7 @@ use axum::Json;
 use chrono::DateTime;
 use serde_json::{json, Map, Value};
 use sqlx::{PgPool, query};
+use tracing::error;
 use uuid::Uuid;
 
 use crate::constants::GLOBAL_TIME_FORMAT;
@@ -45,7 +46,17 @@ pub async fn refresh(
 
     let post_list: Vec<Map<_, _>> = md_list
         .into_iter()
-        .map(|post| post::from_path(post).unwrap())
+        .filter_map(|post_path| match post::from_path(&post_path) {
+            Ok(post) => Some(post),
+            Err(e) => {
+                error!(
+                    "Failed to parse post <{}>, skipping: {}",
+                    post_path,
+                    e.to_string()
+                );
+                None
+            }
+        })
         .collect();
 
     query(POST_DB_MODEL).execute(&db_connection).await.unwrap();
@@ -56,6 +67,64 @@ pub async fn refresh(
     for post in post_list {
         let meta = &post["meta"];
 
+        let post_id = match Uuid::from_str(post["post_id"].as_str().unwrap()) {
+            Ok(id) => id,
+            Err(e) => {
+                error!(
+                    "Failed to parse UUID <{}>: {}",
+                    post["post_id"].as_str().unwrap(),
+                    e.to_string()
+                );
+                continue;
+            }
+        };
+        let title = post["title"].as_str();
+        let summary = post
+            .get("summary")
+            .and_then(|summary| summary.as_str())
+            .unwrap_or("");
+        let content = post["content"].as_str();
+        let last_update = match DateTime::parse_from_str(
+            post["last_update"].as_str().unwrap(),
+            GLOBAL_TIME_FORMAT,
+        ) {
+            Ok(time) => time,
+            Err(e) => {
+                error!(
+                    "Failed to parse last update time for <{}> on db table initialization: {}",
+                    post_id.to_string(),
+                    e.to_string()
+                );
+                continue;
+            }
+        };
+        let first_update = match DateTime::parse_from_str(
+            post["first_update"].as_str().unwrap(),
+            GLOBAL_TIME_FORMAT,
+        ) {
+            Ok(time) => time,
+            Err(e) => {
+                error!(
+                    "Failed to parse first update time for <{}> on db table initialization: {}",
+                    post_id.to_string(),
+                    e.to_string()
+                );
+                continue;
+            }
+        };
+        let sub_title = meta
+            .get("sub_title")
+            .and_then(|sub_title| sub_title.as_str())
+            .unwrap_or("");
+        let category = meta
+            .get("category")
+            .and_then(|category| category.as_str())
+            .unwrap_or("N/A");
+        let header_img = meta
+            .get("header_img")
+            .and_then(|header_img| header_img.as_str())
+            .unwrap_or("");
+
         // table Post
         match query(
             r##"
@@ -63,55 +132,24 @@ INSERT INTO Post (post_id, title, summary, content, last_update, first_update, s
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         "##,
         )
-        .bind(Uuid::from_str(post["post_id"].as_str().unwrap()).unwrap())
-        .bind(post["title"].as_str())
-        .bind(
-            post.get("summary")
-                .and_then(|summary| summary.as_str())
-                .unwrap_or(""),
-        )
-        .bind(post["content"].as_str())
-        .bind(
-            DateTime::parse_from_str(
-                post["last_update"]
-                    .as_str()
-                    .expect("Failed to parse `last_update`"),
-                GLOBAL_TIME_FORMAT,
-            )
-            .expect("Failed to convert `last_update` to NaiveDateTime"),
-        )
-        .bind(
-            DateTime::parse_from_str(
-                post["first_update"]
-                    .as_str()
-                    .expect("Failed to parse `first_update`"),
-                GLOBAL_TIME_FORMAT,
-            )
-            .expect("Failed to convert `first_update` to NaiveDateTime"),
-        )
-        .bind(
-            meta.get("sub_title")
-                .and_then(|sub_title| sub_title.as_str())
-                .unwrap_or(""),
-        )
-            .bind(
-                meta.get("category")
-                    .and_then(|category| category.as_str())
-                    .unwrap_or("N/A"),
-            )
-            .bind(
-                meta.get("header_img")
-                    .and_then(|header_img| header_img.as_str())
-                    .unwrap_or(""),
-            )
+        .bind(post_id)
+        .bind(title)
+        .bind(summary)
+        .bind(content)
+        .bind(last_update)
+        .bind(first_update)
+        .bind(sub_title)
+        .bind(category)
+        .bind(header_img)
         .execute(&db_connection)
         .await
         {
             Ok(_) => {}
             Err(e) => {
+                error!("Database error on initializing post data (insert):<{}> : {}", post_id.to_string(), e.to_string());
                 return Err((
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    Json::from(json!(format!("{{error: {}}}", e.to_string()))),
+                    Json::from(json!(("error:", e.to_string()))),
                 ));
             }
         }
