@@ -40,3 +40,4 @@ bun.lockb
 
 # ide related
 .idea
+/package-lock.json

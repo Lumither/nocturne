@@ -20,9 +20,9 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
         <body className={ `dark:bg-[#282830] min-h-screen` }>
         <NextThemesProvider attribute="class" defaultTheme="dark">
-            <div className={ `justify-center flex flex-row w-full` }>
+            <div className={ `justify-center flex flex-row w-full max-w-full` }>
                 <Navbar />
-                <div className={ `flex flex-col flex-auto max-w-[1024px]` }>
+                <div className={ `flex flex-col flex-1 max-w-[1024px] min-w-0` }>
                     { children }
                     <Footer />
                 </div>

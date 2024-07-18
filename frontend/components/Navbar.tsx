@@ -111,7 +111,7 @@ function Navbar() {
     return (
         <>
             <div
-                className={ `flex flex-col w-auto md:w-full min-w-[50px] max-w-[256px] mr-0 md:mr-2 ml-2 md:ml-8 min-h-dvh pt-8 sticky` }>
+                className={ `flex flex-col min-w-[50px] md:min-w-[256px] mr-0 md:mr-2 ml-2 md:ml-8 min-h-dvh pt-8 sticky` }>
                 <div className={ `fixed min-h-screen h-full` }>
                     <div className={ `hidden md:block` }>
                         <div className={ `flex justify-center items-center my-7` }>

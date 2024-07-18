@@ -29,7 +29,7 @@ async function Blog() {
         return (
             <Card className={ `w-full` }>
                 <CardBody>
-                    Fatal: Failed to load post list.
+                    Fatal: { e.toString() }
                 </CardBody>
             </Card>);
     }

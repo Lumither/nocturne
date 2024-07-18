@@ -5,6 +5,10 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'oss.lumither.com'
+            },
+            {
+                protocol: 'https',
+                hostname: 'pic.re'
             }
         ]
     }
