@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS Meta
+(
+    post_id UUID PRIMARY KEY
+);
