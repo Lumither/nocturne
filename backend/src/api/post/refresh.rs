@@ -147,6 +147,7 @@ async fn build_post_idx(
     if build_post_idx::hash(db_connection, post_id, hash).await? {
         build_post_idx::base(db_connection, &post, post_id, meta).await?;
         build_post_idx::tag(db_connection, post_id, meta).await?;
+        build_post_idx::meta(db_connection, post_id, meta).await?;
     }
 
     Ok(())
