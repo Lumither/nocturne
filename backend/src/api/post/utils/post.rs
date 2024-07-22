@@ -63,7 +63,7 @@ pub fn from_path(path: &str) -> Result<Map<String, Value>, Box<dyn Error>> {
         .arg("--format=%cI")
         .arg("--")
         .current_dir(env::var("GIT_WORK_DIR")?)
-        .arg(&path)
+        .arg(path)
         .output()
     {
         Ok(res) => res,

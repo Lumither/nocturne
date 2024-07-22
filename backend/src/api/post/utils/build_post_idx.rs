@@ -214,9 +214,11 @@ INSERT INTO Hash (post_id, hash) VALUES ($1, $2)
 }
 
 pub async fn meta(db_connection: &PgPool, post_id: Uuid, meta: &Value) -> Result<(), PostIdxError> {
-    if let Err(e) = query(
-format!(
-        r"
+    let mut err_trails = 5;
+    loop {
+        if let Err(e) = query(
+            format!(
+                r"
 DO
 $$
     DECLARE
@@ -260,17 +262,23 @@ $$
     END;
 $$ LANGUAGE plpgsql;
         ", post_id.to_string().as_str(), meta.to_string()
-).as_str()
-    )
-        .execute(db_connection)
-        .await {
-        Err(PostIdxError::DBWriteFailure {
-            data_desc: "post meta data".to_string(),
-            db_table: "Meta".to_string(),
-            id: post_id.to_string(),
-            err_msg: e.to_string(),
-        })
-    } else {
-        Ok(())
+            ).as_str()
+        )
+            .execute(db_connection)
+            .await {
+            if err_trails >= 0 {
+                err_trails -= 1;
+                continue
+            } else {
+                return Err(PostIdxError::DBWriteFailure {
+                    data_desc: "post meta data".to_string(),
+                    db_table: "Meta".to_string(),
+                    id: post_id.to_string(),
+                    err_msg: e.to_string(),
+                })
+            }
+        } else {
+            return Ok(())
+        }
     }
 }

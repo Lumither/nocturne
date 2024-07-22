@@ -2,10 +2,11 @@ use std::{env, fs};
 use std::path::Path;
 use std::str::FromStr;
 
-use axum::extract::State;
+use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::Json;
 use futures::{stream, StreamExt};
+use serde::Deserialize;
 use serde_json::{json, Map, Value};
 use sha2::{Digest, Sha256};
 use sqlx::{PgPool, query};
@@ -16,9 +17,18 @@ use crate::api::post::errors::refresh::PostIdxError;
 use crate::api::post::utils::{build_post_idx, post};
 use crate::model::blog::{POST_BASE_MODEL, POST_HASH_MODEL, POST_META_MODEL, TAG_MODEL};
 
+#[derive(Deserialize)]
+pub struct Params {
+    /// refresh level
+    level: Option<String>,
+}
+
 pub async fn refresh(
     State(db_connection): State<PgPool>,
+    Query(params): Query<Params>,
 ) -> Result<StatusCode, (StatusCode, Json<Value>)> {
+    let is_force_refresh = params.level.unwrap_or("".to_string()) == "force";
+
     // search post
     let data_repo_dir = match env::var("GIT_WORK_DIR") {
         Ok(value) => value,
@@ -32,6 +42,22 @@ pub async fn refresh(
             ));
         }
     };
+
+    if is_force_refresh {
+        if let Err(e) = query("DROP TABLE hash, meta, post, tag;")
+            .execute(&db_connection)
+            .await
+        {
+            error!(
+                "DB query error when deleting table: `hash`, `meta`, `post`, `tag`: {}",
+                e.to_string()
+            );
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json::from(json!(("error", e.to_string()))),
+            ));
+        }
+    }
 
     // generate post idx
     let md_path = search_md(Path::new(&data_repo_dir));
@@ -81,18 +107,29 @@ pub async fn refresh(
         .await
         .unwrap();
 
-    let stream = stream::iter(post_list_with_hash).for_each_concurrent(None, |(post, hash)| {
-        let db_clone = db_connection.clone();
-        async move {
-            if let Err(e) = build_post_idx(&db_clone, post, hash).await {
-                error!("{}", e.to_string());
-            }
-        }
-    });
+    let res: Vec<_> = stream::iter(post_list_with_hash)
+        .map(|(post, hash)| {
+            let db_clone = db_connection.clone();
+            async move { build_post_idx(&db_clone, post, hash).await }
+        })
+        .buffer_unordered(usize::MAX)
+        .collect()
+        .await;
 
-    stream.await;
+    let errs: Vec<_> = res
+        .into_iter()
+        .filter_map(|res| res.err())
+        .map(|e| e.to_string())
+        .collect();
 
-    Ok(StatusCode::OK)
+    if !errs.is_empty() {
+        Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json::from(json!({"error": errs})),
+        ))
+    } else {
+        Ok(StatusCode::OK)
+    }
 }
 
 /// Search a dir, return a list of markdown files
