@@ -5,8 +5,7 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use chrono::{DateTime, Utc};
-use serde_json::{json, Map, Value};
+use serde_json::{json, Value};
 use sqlx::{Error, PgPool, query, Row};
 use tracing::error;
 use uuid::Uuid;
@@ -24,101 +23,90 @@ pub async fn get_post(
                 e.to_string()
             );
             return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
+                StatusCode::BAD_REQUEST,
                 Json::from(json!(("error", e.to_string()))),
+            ));
+        }
+    };
+
+    let post = match query(
+        r#"
+SELECT jsonb_strip_nulls(to_jsonb(t.*)) - 'post_id' AS post
+FROM post t
+WHERE post_id = $1;
+"#,
+    )
+    .bind(post_id)
+    .fetch_one(&db_connection)
+    .await
+    {
+        Ok(value) => value.get::<Value, _>("post"),
+        Err(e) => {
+            error!(
+                "Database error on Reading `base post information` from table `post`: <{}>: {}",
+                post_id.to_string(),
+                e.to_string()
+            );
+            return match e {
+                Error::RowNotFound => Err((
+                    StatusCode::BAD_REQUEST,
+                    Json::from(json!({"error": e.to_string()})),
+                )),
+                _ => Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json::from(json!({"error": e.to_string()})),
+                )),
+            };
+        }
+    };
+
+    let tags: Vec<_> = match query("SELECT tag FROM Tag WHERE post_id = $1;")
+        .bind(post_id)
+        .fetch_all(&db_connection)
+        .await
+    {
+        Ok(tags) => tags.iter().map(|tag| tag.get::<String, _>("tag")).collect(),
+        Err(e) => {
+            error!("Database query error :{}", e.to_string());
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json::from(json!({"error": e.to_string()})),
             ));
         }
     };
 
     let meta = match query(
         r#"
-SELECT *
-FROM Post
+SELECT jsonb_strip_nulls(to_jsonb(t.*)) - 'post_id' AS meta
+FROM meta t
 WHERE post_id = $1;
-    "#,
+        "#,
     )
     .bind(post_id)
     .fetch_one(&db_connection)
     .await
     {
-        Ok(value) => value,
+        Ok(value) => value.get::<Value, _>("meta"),
         Err(e) => {
-            error!("Database query error on fetching meta: {}", e.to_string());
-            return match e {
-                Error::RowNotFound => Err((
-                    StatusCode::BAD_REQUEST,
-                    Json::from(json!(format!("{{error: {}}}", e.to_string()))),
-                )),
-                _ => Err((
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    Json::from(json!(format!("{{error: {}}}", e.to_string()))),
-                )),
-            };
-        }
-    };
-
-    let tags = query(
-        r#"
-SELECT tag FROM Tag WHERE post_id = $1;
-    "#,
-    )
-    .bind(post_id)
-    .fetch_all(&db_connection)
-    .await;
-    let tags = match tags {
-        Ok(tags) => tags,
-        Err(e) => {
-            error!("Database query error :{}", e.to_string());
+            error!(
+                "Database error on Reading `{}` from table `{}`: <{}>: {}",
+                "post meta data",
+                "meta",
+                post_id.to_string(),
+                e.to_string()
+            );
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                Json::from(json!(("error", e.to_string()))),
+                Json::from(json!({"error": e.to_string()})),
             ));
         }
     };
 
-    let mut res = Map::new();
+    // todo: next, prev post
 
-    res.insert(
-        "title".to_string(),
-        json!(meta.get::<String, &str>("title")),
-    );
-    res.insert(
-        "sub_title".to_string(),
-        json!(meta.get::<String, &str>("sub_title")),
-    );
-    res.insert(
-        "category".to_string(),
-        json!(meta.get::<String, &str>("category")),
-    );
-    res.insert(
-        "header_img".to_string(),
-        json!(meta.get::<String, &str>("header_img")),
-    );
-    res.insert(
-        "summary".to_string(),
-        json!(meta.get::<String, &str>("summary")),
-    );
-    res.insert(
-        "content".to_string(),
-        json!(meta.get::<String, &str>("content")),
-    );
-    res.insert(
-        "last_update".to_string(),
-        json!(meta.get::<DateTime<Utc>, &str>("last_update")),
-    );
-    res.insert(
-        "first_update".to_string(),
-        json!(meta.get::<DateTime<Utc>, &str>("first_update")),
-    );
+    let mut res = post.as_object().unwrap().to_owned();
+    res.insert("tags".to_string(), tags.into());
+    res.insert("meta".to_string(), meta.into());
 
-    let tags: Vec<String> = tags
-        .iter()
-        .map(|tag| {
-            let tag: String = tag.get("tag");
-            tag
-        })
-        .collect();
-    res.insert("tags".to_string(), Value::from(tags));
-
-    Ok(Json::from(Value::from(res)))
+    Ok(Json::from(json!(res)))
 }

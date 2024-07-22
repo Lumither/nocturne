@@ -1,5 +1,4 @@
-use base64::Engine;
-use base64::engine::general_purpose;
+use base64::{Engine, engine::general_purpose};
 use chrono::DateTime;
 use serde_json::{Map, Value};
 use sqlx::{PgPool, query, Row};
@@ -218,7 +217,7 @@ pub async fn meta(db_connection: &PgPool, post_id: Uuid, meta: &Value) -> Result
     loop {
         if let Err(e) = query(
             format!(
-                r"
+                r#"
 DO
 $$
     DECLARE
@@ -231,11 +230,16 @@ $$
         _insert_columns TEXT  := 'post_id';
         _insert_values  TEXT  := quote_literal(_post_id);
         _update_set     TEXT  := '';
+        _blacklist      TEXT[] := ARRAY['id', 'tags'];
     BEGIN
         SELECT EXISTS(SELECT 1 FROM meta WHERE post_id = _post_id) INTO _exists;
 
         FOR _col_name, _col_value IN SELECT key, value FROM jsonb_each_text(_meta_cols)
             LOOP
+                IF _col_name = ANY(_blacklist) THEN
+                    CONTINUE; 
+                END IF;
+
                 IF NOT EXISTS (SELECT 1
                                FROM information_schema.columns
                                WHERE table_name = 'meta'
@@ -261,7 +265,7 @@ $$
         END IF;
     END;
 $$ LANGUAGE plpgsql;
-        ", post_id.to_string().as_str(), meta.to_string()
+        "#, post_id.to_string().as_str(), meta.to_string()
             ).as_str()
         )
             .execute(db_connection)

@@ -1,5 +1,4 @@
-use axum::{extract::State, http::StatusCode, Json};
-use axum::extract::Query;
+use axum::{extract::Query, extract::State, http::StatusCode, Json};
 use chrono::{DateTime, Utc};
 use futures::future::join_all;
 use serde::Deserialize;

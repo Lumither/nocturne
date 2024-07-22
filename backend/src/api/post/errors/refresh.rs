@@ -46,7 +46,7 @@ pub enum PostIdxError {
     },
 
     #[error(
-        "Database error on Reading `{}` to table `{}`: <{}>: {}",
+        "Database error on Reading `{}` from table `{}`: <{}>: {}",
         data_desc,
         db_table,
         id,
