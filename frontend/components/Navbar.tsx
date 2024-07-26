@@ -89,7 +89,7 @@ function Navbar() {
     }, [ path ]);
 
 
-    const minMobileWidth: number = 768;
+    const minMobileWidth: number = 1024;
     const [ isMobile, setIsMobile ] = useState(false);
     useEffect(() => {
         const updateMobileWidth = () => {
@@ -111,9 +111,9 @@ function Navbar() {
     return (
         <>
             <div
-                className={ `flex flex-col min-w-[50px] md:min-w-[256px] mr-0 md:mr-2 ml-2 md:ml-8 min-h-dvh pt-8 sticky` }>
+                className={ `flex flex-col min-w-[50px] lg:min-w-[256px] mr-0 lg:mr-2 ml-2 lg:ml-8 min-h-dvh pt-8 sticky` }>
                 <div className={ `fixed min-h-screen h-full` }>
-                    <div className={ `hidden md:block` }>
+                    <div className={ `hidden lg:block` }>
                         <div className={ `flex justify-center items-center my-7` }>
                             <NextImage
                                 src={ 'https://oss.lumither.com/blog/pictures/compr/1717153492846703409_avatar.webp' }
@@ -132,7 +132,7 @@ function Navbar() {
                     </div>
 
                     <div>
-                        <ul className={ `flex flex-col space-y-2 md:space-y-0 md:flex-row items-center my-4 md:space-x-2` }>
+                        <ul className={ `flex flex-col space-y-2 lg:space-y-0 lg:flex-row items-center my-4 lg:space-x-2` }>
                             {
                                 connections.map((conn, key) => (
                                     <li key={ key }>
@@ -154,7 +154,7 @@ function Navbar() {
                     </div>
 
                     <div
-                        className={ `flex justify-center md:justify-start w-full mt-8 ml-0 md:-ml-3` }>
+                        className={ `flex justify-center lg:justify-start w-full mt-8 ml-0 lg:-ml-3` }>
                         <ul className={ `flex flex-col space-y-2 w-full` }>
                             {
                                 entries.map((meta, key) => (
@@ -165,11 +165,11 @@ function Navbar() {
                                             color={ `default` }
                                             fullWidth
                                             isIconOnly={ isMobile }
-                                            className={ 'flex md:justify-start w-fit md:w-full' }
+                                            className={ 'flex lg:justify-start w-fit lg:w-full' }
                                             aria-label={ `navbar: ${ meta.display_name }` }
                                             href={ meta.href }>
                                             { meta.icon }
-                                            <p className={ `font-bold hidden md:block` }>{ meta.display_name }</p>
+                                            <p className={ `font-bold hidden lg:block` }>{ meta.display_name }</p>
                                         </Button>
                                     </li>
                                 ))
@@ -177,7 +177,7 @@ function Navbar() {
                         </ul>
                     </div>
 
-                    <div className={ `mt-8 flex md:hidden justify-center w-full` }>
+                    <div className={ `mt-8 flex lg:hidden justify-center w-full` }>
                         <p className={ `text-center sideways-lr font-bold text-2xl text-zinc-500 dark:text-zinc-400` }>
                             { shownPath }
                         </p>

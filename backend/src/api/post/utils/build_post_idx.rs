@@ -230,7 +230,7 @@ $$
         _insert_columns TEXT  := 'post_id';
         _insert_values  TEXT  := quote_literal(_post_id);
         _update_set     TEXT  := '';
-        _blacklist      TEXT[] := ARRAY['id', 'tags'];
+        _blacklist      TEXT[] := ARRAY['tags'];
     BEGIN
         SELECT EXISTS(SELECT 1 FROM meta WHERE post_id = _post_id) INTO _exists;
 

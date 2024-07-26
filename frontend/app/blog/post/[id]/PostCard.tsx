@@ -10,6 +10,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import Headers from '@/app/blog/post/[id]/Headers';
+import Footer from '@/app/blog/post/[id]/Footer';
 
 type Props = {
     id: string
@@ -37,7 +38,7 @@ async function PostCard(props: Props) {
         <div>
             <Card className={ `max-w-full relative` }>
 
-                {/* card headers*/ }
+                {/* card headers */ }
                 <Headers post={ post_data } />
 
                 {/* card body */ }
@@ -87,6 +88,12 @@ async function PostCard(props: Props) {
                         } }
                     >{ (post_data as any)['content'] }</Markdown>
                 </CardBody>
+
+
+                {/* card footer */ }
+
+                <Footer post={ post_data } />
+
             </Card>
         </div>
     );

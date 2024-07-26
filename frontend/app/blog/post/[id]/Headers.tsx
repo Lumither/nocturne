@@ -10,15 +10,15 @@ type Props = {
 
 const Headers = (props: Props) => {
     let post = props.post;
-    let title = (post as any)['title'];
-    let sub_title = (post as any)['sub_title'];
+    let title = post['title'];
+    let sub_title = post['sub_title'];
     // let summary = (post as any)['summary'];
-    let category = (post as any)['category'];
-    let tags = (post as any)['tags'];
-    let last_update = new Date((post as any)['last_update']);
-    let first_update = new Date((post as any)['first_update']);
-    let post_id = (post as any)['post_id'];
-    let header_img = (post as any)['header_img'];
+    let category = post['category'];
+    let tags = post['tags'];
+    // let last_update = new Date((post as any)['last_update']);
+    let first_update = new Date(post['first_update']);
+    // let post_id = (post as any)['post_id'];
+    let header_img = post['header_img'];
 
     return (
         <>
@@ -39,7 +39,7 @@ const Headers = (props: Props) => {
 
             <div
                 className={ header_img !== '' ?
-                    'mx-8 -mt-16 backdrop-blur bg-zinc-300/80 dark:bg-gray-600/25 rounded-2xl z-30'
+                    'mx-8 -mt-16 backdrop-blur transition bg-zinc-300/80 dark:bg-gray-600/25 rounded-2xl z-30'
                     : 'mx-6 mt-6'
                 }>
                 <div className={ `p-4` }>

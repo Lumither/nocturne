@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-        <body className={ `dark:bg-[#282830] min-h-screen` }>
+        <body className={ `transition duration-300 dark:bg-[#282830] min-h-screen` }>
         <NextThemesProvider attribute="class" defaultTheme="dark">
             <div className={ `justify-center flex flex-row w-full max-w-full` }>
                 <Navbar />
