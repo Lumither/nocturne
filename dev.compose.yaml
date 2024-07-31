@@ -1,0 +1,34 @@
+services:
+  frontend:
+    build:
+      context: ./frontend 
+      dockerfile: ../container/dev/frontend.containerfile
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/app:ro
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env.dev
+    
+    
+  backend:
+    build: 
+      context: ./backend 
+      dockerfile: ../container/dev/backend.containerfile
+    restart: always
+    ports:
+      - 3001:3001
+    volumes:
+      - ./blog_posts_git:/app/blog_posts_git:ro
+    env_file:
+      - .env.dev
+  
+  postgres:
+    image: postgres:16.3
+    ports:
+      - 5432:5432
+    env_file:
+      - .env.dev

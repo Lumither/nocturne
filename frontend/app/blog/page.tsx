@@ -1,14 +1,14 @@
 import React from 'react';
-import fetch_posts_list from '@/app/blog/fetch_posts_list';
 import BlogPostCard from '@/app/blog/BlogPostCard';
 import { Card, CardBody } from '@nextui-org/card';
 import { MotionDiv } from '@/app/public/MotionDiv';
+import { fetchNocturneApi } from '@/app/blog/api';
 
 async function Blog() {
 
-    try {
-        const res = await fetch_posts_list();
-        let posts = res['posts'];
+    const { code, ret } = await fetchNocturneApi('/get_post_list');
+    if (code == 200) {
+        let posts = ret['posts'];
         return (
             // blog list
             <ul className={ 'flex flex-col items-center w-full space-y-7' }>
@@ -25,15 +25,15 @@ async function Blog() {
                 ) }
             </ul>
         );
-    } catch (e: any) {
+    } else {
         return (
+            // todo:  use Error.tsx
             <Card className={ `w-full` }>
                 <CardBody>
-                    Fatal: { e.toString() }
+                    Fatal: { ret }
                 </CardBody>
             </Card>);
     }
-
 }
 
 export default Blog;

@@ -10,7 +10,6 @@ type Props = {
 const Footer = (props: Props) => {
     const { post } = props;
 
-    const header_img = post['header_img'];
     const adjacent_posts = post['adj'];
     const prev_post = adjacent_posts['prev'];
     const next_post = adjacent_posts['next'];

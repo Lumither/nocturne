@@ -28,7 +28,7 @@ check_for_updates() {
          --url "localhost:$BACKEND_PORT"
     #todo: to be continued
   fi
-  }
+}
 
 if [ -d "$GIT_WORK_DIR" ]; then
   check_for_updates

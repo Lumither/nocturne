@@ -4,12 +4,12 @@ use std::num::ParseIntError;
 use std::process::exit;
 use std::str::FromStr;
 
-use axum::routing::{get, post};
 use axum::Router;
+use axum::routing::{get, post};
 use dotenv::dotenv;
-use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use sqlx::ConnectOptions;
-use tracing::{error, warn};
+use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
+use tracing::{error, info, warn};
 
 use crate::api::get::get_post::get_post;
 use crate::api::get::get_post_list::get_post_list;
@@ -25,10 +25,10 @@ mod model;
 async fn main() -> Result<(), Box<dyn Error>> {
     match dotenv() {
         Ok(_) => {
-            println!("[Info] env loaded, starting up...")
+            println!("[Info] env loaded from .env file, starting up...")
         }
-        Err(e) => {
-            panic!("[Fatal] failed to load env var: {}", e)
+        Err(_) => {
+            println!("[Info] .env not detected, starting up...")
         }
     };
 
@@ -42,24 +42,24 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Err(_) => 3001,
     };
 
-    let db_uri: String = env::var("DB_CONNECTION").unwrap_or_else(|e| {
-        error!(
-            "Invalid or missing env var: DB_CONNECTION: {}",
-            e.to_string()
-        );
+    let db_uri: String = env::var("DB_URI").unwrap_or_else(|e| {
+        error!("Invalid or missing env var: DB_URI: {}", e.to_string());
         exit(1);
     });
     let db_connect_option = PgConnectOptions::from_str(&db_uri)
         .unwrap()
         .disable_statement_logging();
 
-    let db_pool = PgPoolOptions::new()
-        .connect_with(db_connect_option)
-        .await
-        .unwrap_or_else(|e| {
+    let db_pool = match PgPoolOptions::new().connect_with(db_connect_option).await {
+        Ok(pool) => {
+            info!("Database connected");
+            pool
+        }
+        Err(e) => {
             error!("Failed to load database: {}", e.to_string());
             exit(1);
-        });
+        }
+    };
 
     let app = Router::new()
         .route("/refresh_posts", post(refresh))

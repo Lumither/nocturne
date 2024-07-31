@@ -44,7 +44,7 @@ pub async fn refresh(
     };
 
     if is_force_refresh {
-        if let Err(e) = query("DROP TABLE hash, meta, post, tag;")
+        if let Err(e) = query("DROP TABLE IF EXISTS hash, meta, post, tag;")
             .execute(&db_connection)
             .await
         {

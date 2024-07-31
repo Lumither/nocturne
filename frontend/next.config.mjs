@@ -11,7 +11,8 @@ const nextConfig = {
                 hostname: 'pic.re'
             }
         ]
-    }
+    },
+    output: 'standalone'
 };
 
 export default nextConfig;
