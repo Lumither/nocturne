@@ -16,7 +16,7 @@ async function Blog({ searchParams }: {
     return (
         <div className={ 'w-full min-w-full space-y-4' }>
             <PostList page={ currPage } />
-            <Pagination total={ pageCount + 10 } />
+            <Pagination total={ pageCount } />
         </div>
     );
 }
