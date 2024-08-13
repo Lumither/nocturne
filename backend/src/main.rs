@@ -4,16 +4,16 @@ use std::num::ParseIntError;
 use std::process::exit;
 use std::str::FromStr;
 
-use axum::Router;
-use axum::routing::{get, post};
-use dotenv::dotenv;
-use sqlx::ConnectOptions;
-use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
-use tracing::{error, info, warn};
-
+use crate::api::get::get_page_count::get_page_count;
 use crate::api::get::get_post::get_post;
 use crate::api::get::get_post_list::get_post_list;
 use crate::api::post::refresh::refresh;
+use axum::routing::{get, post};
+use axum::Router;
+use dotenv::dotenv;
+use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
+use sqlx::ConnectOptions;
+use tracing::{error, info, warn};
 
 mod api;
 mod constants;
@@ -23,6 +23,16 @@ mod model;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    if let Some(env_file) = env::args().nth(1) {
+        match dotenv::from_filename(&env_file) {
+            Ok(_) => {
+                println!("[Info] env loaded from {}", env_file);
+            }
+            Err(e) => {
+                panic!("[Fatal] failed to read {}: {}", env_file, e);
+            }
+        }
+    };
     match dotenv() {
         Ok(_) => {
             println!("[Info] env loaded from .env file, starting up...")
@@ -42,11 +52,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Err(_) => 3001,
     };
 
-    let db_uri: String = env::var("DB_URI").unwrap_or_else(|e| {
-        error!("Invalid or missing env var: DB_URI: {}", e.to_string());
-        exit(1);
-    });
-    let db_connect_option = PgConnectOptions::from_str(&db_uri)
+    let db_connect_option = PgConnectOptions::from_str(dbg!(&parse_db_uri()))
         .unwrap()
         .disable_statement_logging();
 
@@ -64,6 +70,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let app = Router::new()
         .route("/refresh_posts", post(refresh))
         .route("/get_post_list", get(get_post_list))
+        .route("/get_page_count", get(get_page_count))
         .route("/get_post/:post_id", get(get_post))
         .with_state(db_pool);
 
@@ -80,4 +87,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
     });
 
     Ok(())
+}
+
+fn parse_db_uri() -> String {
+    let postgres_user = env::var("POSTGRES_USER").unwrap_or("".to_string());
+    let postgres_password = env::var("POSTGRES_PASSWORD").unwrap_or("".to_string());
+    let db_host = env::var("DB_HOST").unwrap_or("localhost".to_string());
+    let db_port = env::var("DB_PORT")
+        .unwrap_or("5432".to_string())
+        .to_string();
+    let postgres_db = env::var("POSTGRES_DB").unwrap_or("nocturne".to_string());
+
+    format!("postgresql://{postgres_user}:{postgres_password}@{db_host}:{db_port}/{postgres_db}")
 }

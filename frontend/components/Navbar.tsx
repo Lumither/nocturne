@@ -89,11 +89,11 @@ function Navbar() {
     }, [ path ]);
 
 
-    const minMobileWidth: number = 1024;
+    const maxMobileWidth: number = 1024;
     const [ isMobile, setIsMobile ] = useState(false);
     useEffect(() => {
         const updateMobileWidth = () => {
-            if (window.innerWidth <= minMobileWidth) {
+            if (window.innerWidth <= maxMobileWidth) {
                 setIsMobile(true);
             } else {
                 setIsMobile(false);

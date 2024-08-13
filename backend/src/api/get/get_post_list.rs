@@ -1,9 +1,10 @@
+use crate::constants::PAGE_SIZE;
 use axum::{extract::Query, extract::State, http::StatusCode, Json};
 use chrono::{DateTime, Utc};
 use futures::future::join_all;
 use serde::Deserialize;
 use serde_json::{json, Map, Value};
-use sqlx::{PgPool, postgres::PgRow, query, Row};
+use sqlx::{postgres::PgRow, query, PgPool, Row};
 use tracing::error;
 use uuid::Uuid;
 
@@ -12,13 +13,19 @@ pub struct Params {
     page: Option<u32>,
 }
 
-const PAGE_SIZE: u32 = 6;
-
 pub async fn get_post_list(
     State(db_connection): State<PgPool>,
     Query(params): Query<Params>,
 ) -> Result<Json<Value>, (StatusCode, Json<Value>)> {
-    let offset = PAGE_SIZE * (params.page.unwrap_or(1) - 1);
+    let search_param_page = params.page.unwrap_or(1);
+    if search_param_page < 1 {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json::from(json!({"error": "`page` should be greater than 0"})),
+        ));
+    }
+
+    let offset = PAGE_SIZE * (search_param_page - 1);
 
     let post_list = sqlx::query("SELECT * FROM post ORDER BY first_update DESC LIMIT $1 OFFSET $2")
         .bind(PAGE_SIZE as i32)
@@ -34,7 +41,7 @@ pub async fn get_post_list(
             );
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                Json::from(json!(("error", e.to_string()))),
+                Json::from(json!({"error": e.to_string()})),
             ));
         }
     };

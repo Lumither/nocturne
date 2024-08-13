@@ -13,15 +13,9 @@ const NOCTURNE_ENDPOINT = ((isServerSide = true) => {
     }
 });
 
-export async function fetchNocturneApi(path: string, isServerSideRequest = true): Promise<{ code: number, ret: any }> {
-    let res = await fetch(`${ NOCTURNE_ENDPOINT(isServerSideRequest) }${ path }`, {
+export async function fetchNocturneApi(path: string, isServerSideRequest = true) {
+    return await fetch(`${ NOCTURNE_ENDPOINT(isServerSideRequest) }${ path }`, {
         cache: 'no-cache'
     });
-
-    if (!res.ok) {
-        return { code: res.status, ret: (await res.json()) };
-    }
-
-    return { code: res.status, ret: await res.json() };
 }
 

@@ -23,13 +23,15 @@ const MinifyPostCard = (props: Props) => {
                     <p className={ `text-tiny uppercase font-bold ${ img_url ? 'text-white/60' : 'text-black/60 dark:text-white/60' }` }>{ desc }</p>
                 </CardHeader>
                 { img_url &&
-                    <div>
-                        <Image
-                            className={ 'object-cover object-center ' }
-                            src={ img_url }
-                            alt={ post.title }
-                            fill
-                        />
+                    <div className={ 'h-full' }>
+                        <div className={ 'relative h-[300px] overflow-hidden' }>
+                            <Image
+                                className={ 'object-cover object-center ' }
+                                src={ img_url }
+                                alt={ post.title }
+                                fill
+                            />
+                        </div>
                         <CardFooter
                             className="absolute transition-colors bg-zinc-300/80 dark:bg-gray-600/25 dark:backdrop-brightness-75 bottom-0  justify-between rounded-none">
                             <div>

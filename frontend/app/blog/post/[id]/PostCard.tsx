@@ -17,11 +17,11 @@ type Props = {
 }
 
 async function PostCard(props: Props) {
-   
-    const { code, ret } = await fetchNocturneApi(`/get_post/${ props.id }`);
 
-    if (code == 200) {
 
+    try {
+        const res = await fetchNocturneApi(`/get_post/${ props.id }`);
+        const ret: any = await res.json();
         return (
             <div>
                 <Card className={ `max-w-full relative` }>
@@ -85,11 +85,11 @@ async function PostCard(props: Props) {
                 </Card>
             </div>
         );
-    } else {
+    } catch (e: any) {
         return <div>
             <Card className={ `w-full` }>
                 <CardBody>
-                    Fatal: { ret }
+                    Fatal: { e.toString() }
                 </CardBody>
             </Card>
         </div>;
