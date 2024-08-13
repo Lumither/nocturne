@@ -1,5 +1,6 @@
 # confidential
 .env.*
+/container/*/.env
 
 # idea related
 .idea

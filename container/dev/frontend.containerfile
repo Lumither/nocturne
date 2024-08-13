@@ -1,14 +1,13 @@
 # docker/dev.Dockerfile
-FROM oven/bun:latest
+FROM node:latest
 
 WORKDIR /app
 
 COPY package.json ./
-COPY bun.lockb ./
 
-RUN bun install
+RUN npm install
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-CMD bun run dev
+CMD npm run dev
 

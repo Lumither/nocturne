@@ -7,11 +7,13 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./frontend:/app:ro
+      - ./frontend:/app
       - /app/node_modules
       - /app/.next
     env_file:
-      - .env.dev
+      - ./container/dev/.env
+    dns:
+      - 1.1.1.1
     
     
   backend:
@@ -24,11 +26,11 @@ services:
     volumes:
       - ./blog_posts_git:/app/blog_posts_git:ro
     env_file:
-      - .env.dev
+      - ./container/dev/.env
   
   postgres:
     image: postgres:16.3
     ports:
       - 5432:5432
     env_file:
-      - .env.dev
+      - ./container/dev/.env
