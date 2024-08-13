@@ -13,8 +13,6 @@ async function Blog({ searchParams }: {
     const ret = await fetchNocturneApi(`/get_page_count`);
     const pageCount = (await ret.json() as any)['res'] as number;
 
-    console.log(currPage);
-
     return (
         <div className={ 'w-full min-w-full space-y-4' }>
             <PostList page={ currPage } />
