@@ -6,8 +6,7 @@ import Link from 'next/link';
 
 export default async function Friends() {
 
-    let list = await fetchJson('https://raw.githubusercontent.com/Lumither/friends/master/friends.json');
-
+    const list = await fetchJson('https://raw.githubusercontent.com/Lumither/friends/master/friends.json');
     const listLength = list.length;
     const listMaxIdx = listLength - 1;
     const listIsOdd = listLength % 2 !== 0;
@@ -36,9 +35,9 @@ export default async function Friends() {
                                         shadow={ 'none' }
                                         as={ Link }
                                         href={ friend['url'] }
-                                        className={ 'dark:bg-[#282830]' }
+                                        className={ 'dark:bg-[#282830] w-full md:w-fit max-w-full shadow' }
                                     >
-                                        <CardBody className={ 'pb-0' }>
+                                        <CardBody className={ 'overflow-visible pb-0.5' }>
                                             <div className={ 'flex flex-row' }>
                                                 <div className={ 'flex p-2' }>
                                                     <div
@@ -68,7 +67,16 @@ export default async function Friends() {
                                                 </div>
                                             </div>
                                         </CardBody>
-                                        <div className={ 'h-1 bg-blue-800 dark:bg-blue-300' } />
+                                        <div className={ 'h-2 relative w-full' }>
+                                            <Image
+                                                alt="theme bar"
+                                                draggable={ false }
+                                                className="object-cover object-center scale-110 blur-lg"
+                                                fill
+                                                unoptimized
+                                                src={ friend['avatar'] }
+                                            />
+                                        </div>
                                     </Card>
                                 </li>
                             ))
