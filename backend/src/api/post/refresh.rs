@@ -1,6 +1,6 @@
-use std::{env, fs};
 use std::path::Path;
 use std::str::FromStr;
+use std::{env, fs};
 
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
@@ -9,7 +9,7 @@ use futures::{stream, StreamExt};
 use serde::Deserialize;
 use serde_json::{json, Map, Value};
 use sha2::{Digest, Sha256};
-use sqlx::{PgPool, query};
+use sqlx::{query, PgPool};
 use tracing::error;
 use uuid::Uuid;
 
@@ -42,6 +42,7 @@ pub async fn refresh(
             ));
         }
     };
+    let post_dir = Path::new(&data_repo_dir).join("posts");
 
     if is_force_refresh {
         if let Err(e) = query("DROP TABLE IF EXISTS hash, meta, post, tag;")
@@ -60,9 +61,9 @@ pub async fn refresh(
     }
 
     // generate post idx
-    let md_path = search_md(Path::new(&data_repo_dir));
+    let post_path = search_md(&post_dir);
 
-    let post_list_with_hash: Vec<(Map<_, _>, Vec<_>)> = md_path
+    let post_list_with_hash: Vec<(Map<_, _>, Vec<_>)> = post_path
         .into_iter()
         .filter_map(|post_path| match post::from_path(&post_path) {
             Ok(post) => match fs::read(&post_path) {

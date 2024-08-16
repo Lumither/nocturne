@@ -1,6 +1,7 @@
 import React from 'react';
 import PostCard from '@/app/blog/post/[id]/PostCard';
 import { MotionDiv } from '@/app/public/MotionDiv';
+import ButtonGoBack from '@/app/blog/post/[id]/ButtonGoBack';
 
 function BlogReader({ params }: { params: { id: string } }) {
 
@@ -13,6 +14,9 @@ function BlogReader({ params }: { params: { id: string } }) {
         >
             <div className={ `max-w-full` }>
                 <PostCard id={ params.id } />
+            </div>
+            <div className={ 'mt-3' }>
+                <ButtonGoBack />
             </div>
         </MotionDiv>
     );

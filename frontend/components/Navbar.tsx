@@ -3,16 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@nextui-org/react';
 import NextImage from 'next/image';
-import {
-    IoFileTrayFull,
-    IoHome,
-    IoInformationCircle,
-    IoLogoGithub,
-    IoMail,
-    IoPencil,
-    IoPricetags,
-    IoSearch
-} from 'react-icons/io5';
+import { IoHome, IoInformationCircle, IoLink, IoLogoGithub, IoMail, IoPencil, IoSearch } from 'react-icons/io5';
 import Link from 'next/link';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { usePathname } from 'next/navigation';
@@ -34,14 +25,9 @@ const entries: { display_name: string; href: string; icon: React.ReactNode }[] =
         href: '/blog'
     },
     {
-        icon: <IoPricetags size={ `20px` }></IoPricetags>,
-        display_name: 'Tags',
-        href: '/tags'
-    },
-    {
-        icon: <IoFileTrayFull size={ `20px` }></IoFileTrayFull>,
-        display_name: 'Archive',
-        href: '/archive'
+        icon: <IoLink size={ `20px` }></IoLink>,
+        display_name: 'Friends',
+        href: '/friends'
     },
     {
         icon: <IoSearch size={ `20px` }></IoSearch>,
@@ -116,7 +102,7 @@ function Navbar() {
                     <div className={ `hidden lg:block` }>
                         <div className={ `flex justify-center items-center my-7` }>
                             <NextImage
-                                src={ 'https://oss.lumither.com/blog/pictures/compr/1717153492846703409_avatar.webp' }
+                                src={ 'https://oss.lumither.com/blog/pictures/avatar.webp' }
                                 alt={ 'avatar' }
                                 width={ 200 }
                                 height={ 200 }
