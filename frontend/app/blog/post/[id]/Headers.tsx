@@ -42,7 +42,7 @@ const Headers = (props: Props) => {
                     'mx-8 -mt-16 backdrop-blur transition bg-zinc-300/80 dark:bg-gray-600/25 rounded-2xl z-30'
                     : 'mx-6 mt-6'
                 }>
-                <div className={ `p-4` }>
+                <div className={ header_img !== '' ? `p-4` : 'p-4 pt-2' }>
                     <Chip className={ `mb-2` } radius={ `sm` } color={ `secondary` }
                           variant={ `solid` }>{ category }</Chip>
                     <p className={ `text-4xl font-bold` }> { title }</p>

@@ -25,7 +25,14 @@ const Footer = (props: Props) => {
         <div className={ `w-full` }>
 
             <div className={ 'flex transition bg-zinc-300/80 dark:bg-gray-600/25' }>
-                <div className={ `p-8 w-full` }>
+                <div className={ `p-8 w-full overflow-hidden` }>
+                    <div className={ 'relative' }>
+                        <FaCreativeCommons
+                            size={ '160px' }
+                            className={ 'absolute right-0 top-0 -mt-[4.8rem] -mr-16 opacity-30 brightness-50  ' }
+                        />
+                    </div>
+
                     <div className={ 'flex flex-col space-y-4 relative' }>
                         <div className={ 'z-[2]' }>
                             <p className={ 'text-xl font-bold' }>{ post['meta']['title'] }</p>
@@ -63,8 +70,6 @@ const Footer = (props: Props) => {
                                 </Link>
                             </div>
                         </div>
-                        <FaCreativeCommons size={ '80px' }
-                                           className={ 'absolute inset-y-0 right-0 opacity-50 brightness-75  z-0' } />
                     </div>
                 </div>
             </div>

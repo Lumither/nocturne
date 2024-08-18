@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@nextui-org/react';
-import NextImage from 'next/image';
+import Image from 'next/image';
 import { IoHome, IoInformationCircle, IoLink, IoLogoGithub, IoMail, IoPencil, IoSearch } from 'react-icons/io5';
 import Link from 'next/link';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { usePathname } from 'next/navigation';
+import { useScreenSizeTrigger } from '@/app/public/screenSizeTrigger';
 
 const entries: { display_name: string; href: string; icon: React.ReactNode }[] = [
     {
@@ -50,17 +51,17 @@ const connections: { label: string, href: string, icon: React.ReactNode }[] = [
 ];
 
 function Navbar() {
-    const [ scrolled, setScrolled ] = useState(false);
-    useEffect(() => {
-        const handleScroll = () => {
-            const isScrolled = window.scrollY > 0;
-            setScrolled(isScrolled);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
+    // const [ scrolled, setScrolled ] = useState(false);
+    // useEffect(() => {
+    //     const handleScroll = () => {
+    //         const isScrolled = window.scrollY > 0;
+    //         setScrolled(isScrolled);
+    //     };
+    //     window.addEventListener('scroll', handleScroll);
+    //     return () => {
+    //         window.removeEventListener('scroll', handleScroll);
+    //     };
+    // }, []);
 
 
     const path = usePathname();
@@ -74,41 +75,24 @@ function Navbar() {
         }
     }, [ path ]);
 
-
-    const maxMobileWidth: number = 1024;
-    const [ isMobile, setIsMobile ] = useState(false);
-    useEffect(() => {
-        const updateMobileWidth = () => {
-            if (window.innerWidth <= maxMobileWidth) {
-                setIsMobile(true);
-            } else {
-                setIsMobile(false);
-            }
-        };
-        updateMobileWidth();
-        window.addEventListener('resize', updateMobileWidth);
-        return () => {
-            window.removeEventListener('resize', updateMobileWidth);
-        };
-
-    }, []);
-
+    const isMobile = useScreenSizeTrigger('lg');
 
     return (
         <>
             <div
-                className={ `flex flex-col min-w-[50px] lg:min-w-[256px] mr-0 lg:mr-2 ml-2 lg:ml-8 min-h-dvh pt-8 sticky` }>
+                className={ `flex flex-col min-w-[50px] lg:min-w-[200px] ml-2 mr-0 lg:ml-8 lg:mr-6 min-h-screen pt-8 sticky` }>
                 <div className={ `fixed min-h-screen h-full` }>
                     <div className={ `hidden lg:block` }>
-                        <div className={ `flex justify-center items-center my-7` }>
-                            <NextImage
-                                src={ 'https://oss.lumither.com/blog/pictures/avatar.webp' }
-                                alt={ 'avatar' }
-                                width={ 200 }
-                                height={ 200 }
-                                className={ 'rounded-full justify-self-center' }
-                                priority={ true }
-                            ></NextImage>
+                        <div className={ `flex justify-center items-center my-7 h-[200px] w-[200px]` }>
+                            <div className={ 'relative w-full h-full' }>
+                                <Image
+                                    src={ 'https://oss.lumither.com/blog/pictures/avatar.webp' }
+                                    alt={ 'avatar' }
+                                    fill
+                                    className={ 'rounded-full object-cover' }
+                                    loading={ 'eager' }
+                                ></Image>
+                            </div>
                         </div>
 
                         <div>
@@ -153,7 +137,8 @@ function Navbar() {
                                             isIconOnly={ isMobile }
                                             className={ 'flex lg:justify-start w-fit lg:w-full' }
                                             aria-label={ `navbar: ${ meta.display_name }` }
-                                            href={ meta.href }>
+                                            href={ meta.href }
+                                        >
                                             { meta.icon }
                                             <p className={ `font-bold hidden lg:block` }>{ meta.display_name }</p>
                                         </Button>
@@ -170,7 +155,7 @@ function Navbar() {
                     </div>
 
                     <div
-                        className={ `absolute bottom-8 mb-8` }
+                        className={ `absolute bottom-16` }
                     >
                         <ThemeSwitcher />
                     </div>

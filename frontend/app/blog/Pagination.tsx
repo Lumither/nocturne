@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Pagination as NextUIPagination } from '@nextui-org/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useScreenSizeTrigger } from '@/app/public/screenSizeTrigger';
 
 const Pagination = ({ total }: {
     total: number,
@@ -12,23 +13,7 @@ const Pagination = ({ total }: {
 
     const router = useRouter();
 
-    const maxMobileWidth: number = 768;
-    const [ isMobile, setIsMobile ] = useState(false);
-    useEffect(() => {
-        const updateMobileWidth = () => {
-            if (window.innerWidth <= maxMobileWidth) {
-                setIsMobile(true);
-            } else {
-                setIsMobile(false);
-            }
-        };
-        updateMobileWidth();
-        window.addEventListener('resize', updateMobileWidth);
-        return () => {
-            window.removeEventListener('resize', updateMobileWidth);
-        };
-
-    }, []);
+    const isMobile = useScreenSizeTrigger('md');
 
     return (
         <div className={ 'w-full p-4 pt-6 flex justify-center' }>

@@ -33,19 +33,23 @@ function BlogPostCard({ post }: Props) {
                     <Image
                         alt={ 'cover picture' }
                         src={ header_img }
-                        className={ `w-full object-cover rounded-b-none` }
-                        style={ {
-                            'maskImage': 'linear-gradient(black 95%, transparent)',
-                            'backdropFilter': 'blur(20px)'
-                        } }
+                        className={ `w-full object-cover rounded-b-none z-10` }
+                        loading={ 'eager' }
+                        fill
+                    ></Image>
+                    <Image
+                        alt={ 'cover picture shadow' }
+                        src={ header_img }
+                        loading={ 'eager' }
+                        className={ `w-full object-cover rounded-b-none scale-y-110 blur-2xl` }
                         fill
                     ></Image>
                 </div> }
 
                 <CardBody className={ `overflow-visible` }>
                     <div className={ `flex flex-row justify-between` }>
-                        <div className={ `mx-2 ${ header_img !== '' ? '-mt-8' : 'mt-2' }` }>
-                            <Chip className={ `mb-2 z-30` } radius={ `sm` } color={ `secondary` }
+                        <div className={ `mx-2 ${ header_img !== '' ? '-mt-6' : 'mt-2' }` }>
+                            <Chip className={ `mb-2 z-30 text-lg` } radius={ `sm` } size={ 'lg' } color={ `secondary` }
                                   variant={ `solid` }>{ category }</Chip>
                             <p className={ `text-4xl font-bold` }> { title }</p>
                             <p className={ `text-xl` }> { sub_title }</p>
@@ -54,13 +58,7 @@ function BlogPostCard({ post }: Props) {
                     </div>
                 </CardBody>
 
-                {/*   <CardBody className={ `transition-all duration-300 hidden group-hover:block` }>
-                 <div className={ `mx-2` }>
-                 <p>{ summary }</p>
-                 </div>
-                 </CardBody>*/ }
-
-                <CardFooter>
+                <CardFooter className={ 'pt-0' }>
                     <div className={ `flex flex-row flex-wrap justify-between w-full` }>
                         <div>
                             <ul className={ `flex flex-row flex-wrap` }>
