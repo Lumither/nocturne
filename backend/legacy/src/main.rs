@@ -4,13 +4,12 @@ use std::num::ParseIntError;
 use std::process::exit;
 use std::str::FromStr;
 
-use crate::api::get::get_page_count::get_page_count;
-use crate::api::get::get_post::get_post;
-use crate::api::get::get_post_list::get_post_list;
-use crate::api::post::refresh::refresh;
+use crate::api::{
+    get::{get_page_count::get_page_count, get_post::get_post, get_post_list::get_post_list},
+    post::refresh::refresh,
+};
 use axum::routing::{get, post};
 use axum::Router;
-use dotenv::dotenv;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use sqlx::ConnectOptions;
 use tracing::{error, info, warn};
@@ -26,21 +25,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if let Some(env_file) = env::args().nth(1) {
         match dotenv::from_filename(&env_file) {
             Ok(_) => {
-                println!("[Info] env loaded from {}", env_file);
+                println!("[Info] env loaded from {}, starting up", env_file);
             }
             Err(e) => {
                 panic!("[Fatal] failed to read {}: {}", env_file, e);
             }
         }
-    };
-    match dotenv() {
-        Ok(_) => {
-            println!("[Info] env loaded from .env file, starting up...")
-        }
-        Err(_) => {
-            println!("[Info] .env not detected, starting up...")
-        }
-    };
+    } else {
+        println!("[info] no .env file referred, starting up")
+    }
 
     let _guards = logger::init();
 
@@ -52,7 +45,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Err(_) => 3001,
     };
 
-    let db_connect_option = PgConnectOptions::from_str(dbg!(&parse_db_uri()))
+    let db_connect_option = PgConnectOptions::from_str(&parse_db_uri())
         .unwrap()
         .disable_statement_logging();
 
