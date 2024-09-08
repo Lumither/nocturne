@@ -1,14 +1,16 @@
-use std::{env, io};
-
 use chrono::Local;
+use dirs::home_dir;
+use std::path::Path;
+use std::{env, io};
 use tracing::info;
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_appender::{non_blocking, rolling};
+use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::fmt::format::Writer;
 use tracing_subscriber::fmt::time::FormatTime;
 use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Registry};
+use tracing_subscriber::{fmt, Layer, Registry};
 
 struct LocalTimer;
 
@@ -25,44 +27,78 @@ impl FormatTime for LocalTimer {
 type _LogWriter = dyn for<'writer> MakeWriter<'writer, Writer = dyn io::Write + 'static> + 'static;
 
 pub fn init() -> (WorkerGuard, WorkerGuard) {
-    let log_path = env::var("LOG_ROOT_DIR").unwrap_or_else(|e| {
-        panic!("[fatal] failed to load LOG_ROOT_DIR: {}", e);
+    let log_path = &env::var("LOG_ROOT_DIR").unwrap_or_else(|e| {
+        if let Ok(default_log_path) = env::var("WORK_DIR") {
+            if default_log_path.starts_with('~') {
+                let home_path = home_dir()
+                    .expect("[fatal] unable to locate home dir with parsing env `WORK_DIR`, try to use absolute path instead");
+                home_path
+                    .join(default_log_path.strip_prefix("~/").unwrap())
+                    .into_os_string()
+                    .into_string()
+                    .expect("[fatal] failed to parse env `WORK_DIR`, try to use absolute path instead")
+            } else {
+                default_log_path
+            }
+        } else {
+            panic!("[fatal] failed to parse env `LOG_ROOT_DIR`: {}", e);
+        }
     });
 
-    let log_path = format!("{}/backend", log_path);
+    let log_path = Path::new(log_path)
+        .join("log")
+        .join("backend")
+        .into_os_string()
+        .into_string()
+        .unwrap_or_else(|e| panic!("[fatal] failed to parse {:?}", e));
 
     let (info_log_writer, info_guard) = non_blocking(rolling::never(&log_path, "info.log"));
 
     let (err_log_writer, error_guard) = non_blocking(rolling::never(&log_path, "error.log"));
 
-    let log_format = tracing_subscriber::fmt::format()
+    let info_format = tracing_subscriber::fmt::format()
+        .with_level(true)
+        .with_target(true)
+        .with_source_location(true)
+        .with_ansi(false);
+    let err_format = tracing_subscriber::fmt::format()
+        .with_level(true)
+        .with_target(true)
+        .with_source_location(true)
+        .with_ansi(false);
+    let stdout_format = tracing_subscriber::fmt::format()
         .with_level(true)
         .with_target(true)
         .with_source_location(true)
         .with_timer(LocalTimer);
 
+    // let default_filter = tracing_subscriber::filter::EnvFilter::try_from_default_env()
+    //     .unwrap_or_else(|_| "tower_http=debug,axum::rejection=trace".into());
+
     let subscribers = Registry::default()
         .with(
             fmt::Layer::default()
                 .with_writer(info_log_writer)
-                .with_ansi(false),
+                .event_format(info_format),
         )
         .with(
             fmt::Layer::default()
                 .with_writer(err_log_writer)
-                .with_ansi(false),
+                .event_format(err_format)
+                .with_filter(LevelFilter::ERROR),
         )
         .with(
             fmt::Layer::default()
                 .with_writer(io::stdout)
                 .with_ansi(true)
-                .event_format(log_format),
+                .event_format(stdout_format),
         );
 
     tracing::subscriber::set_global_default(subscribers)
         .expect("[fatal] Failed to setup logging system");
 
     info!("Module Started: Logger");
+    info!("Logging to file {}", log_path);
 
     (info_guard, error_guard)
 }
