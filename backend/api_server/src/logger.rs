@@ -1,16 +1,14 @@
-use chrono::Local;
-use dirs::home_dir;
 use std::path::Path;
 use std::{env, io};
+
+use chrono::Local;
+use dirs::home_dir;
 use tracing::info;
-use tracing_appender::non_blocking::WorkerGuard;
-use tracing_appender::{non_blocking, rolling};
-use tracing_subscriber::filter::LevelFilter;
-use tracing_subscriber::fmt::format::Writer;
-use tracing_subscriber::fmt::time::FormatTime;
-use tracing_subscriber::fmt::MakeWriter;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Layer, Registry};
+use tracing_appender::{non_blocking, non_blocking::WorkerGuard, rolling};
+use tracing_subscriber::{
+    filter::LevelFilter, fmt, fmt::format::Writer, fmt::time::FormatTime, fmt::MakeWriter,
+    layer::SubscriberExt, Layer, Registry,
+};
 
 struct LocalTimer;
 
@@ -95,10 +93,10 @@ pub fn init() -> (WorkerGuard, WorkerGuard) {
         );
 
     tracing::subscriber::set_global_default(subscribers)
-        .expect("[fatal] Failed to setup logging system");
+        .expect("[fatal] failed to setup logging system");
 
-    info!("Module Started: Logger");
-    info!("Logging to file {}", log_path);
+    info!("module started: logger");
+    info!("logging to dir: {}", log_path);
 
     (info_guard, error_guard)
 }

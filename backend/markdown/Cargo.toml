@@ -4,3 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+uuid = { version = "1.10.0", features = ["v4", "fast-rng", "serde"] }
+chrono = { version = "0.4.38", features = ["serde", "alloc"] }
+serde = { version = "1.0.209", features = ["derive"] }
+serde_json = "1.0.128"
+regex = "1.10.4"
+yaml-rust2 = "0.8.1"
+sha2 = "0.10.8"
+base64 = "0.22.1"

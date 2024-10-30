@@ -1,4 +1,5 @@
-use crate::constants::PAGE_SIZE;
+use constants::blog::PAGE_SIZE;
+
 use axum::extract::State;
 use axum::Json;
 use serde_json::{json, Value};

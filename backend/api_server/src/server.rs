@@ -1,45 +1,20 @@
 use std::env;
-use std::error::Error;
 use std::num::ParseIntError;
 use std::process::exit;
 use std::str::FromStr;
 
-use crate::api::{
-    get::{get_page_count::get_page_count, get_post::get_post, get_post_list::get_post_list},
-    post::refresh::refresh,
-};
-use axum::routing::{get, post};
+use crate::blog;
 use axum::Router;
-use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
-use sqlx::ConnectOptions;
+use sqlx::{
+    postgres::{PgConnectOptions, PgPoolOptions},
+    ConnectOptions,
+};
 use tracing::{error, info, warn};
 
-mod api;
-mod constants;
-mod logger;
-mod markdown;
-mod model;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    if let Some(env_file) = env::args().nth(1) {
-        match dotenv::from_filename(&env_file) {
-            Ok(_) => {
-                println!("[Info] env loaded from {}, starting up", env_file);
-            }
-            Err(e) => {
-                panic!("[Fatal] failed to read {}: {}", env_file, e);
-            }
-        }
-    } else {
-        println!("[info] no .env file referred, starting up")
-    }
-
-    let _guards = logger::init();
-
+pub async fn start() {
     let port: u32 = match env::var("BACKEND_PORT") {
         Ok(value) => value.parse().unwrap_or_else(|e: ParseIntError| {
-            warn!("Failed to parse BACKEND_PORT: {}", e.to_string());
+            warn!("failed to parse BACKEND_PORT: {}", e.to_string());
             3001
         }),
         Err(_) => 3001,
@@ -51,35 +26,30 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let db_pool = match PgPoolOptions::new().connect_with(db_connect_option).await {
         Ok(pool) => {
-            info!("Database connected");
+            info!("database connected");
             pool
         }
         Err(e) => {
-            error!("Failed to load database: {}", e.to_string());
+            error!("failed to load database: {}", e.to_string());
             exit(1);
         }
     };
 
     let app = Router::new()
-        .route("/refresh_posts", post(refresh))
-        .route("/get_post_list", get(get_post_list))
-        .route("/get_page_count", get(get_page_count))
-        .route("/get_post/:post_id", get(get_post))
+        .nest("blog", blog::get_router())
         .with_state(db_pool);
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
         .unwrap_or_else(|e| {
-            error!("Failed to build TCP listener: {}", e.to_string());
+            error!("failed to build TCP listener: {}", e.to_string());
             exit(1);
         });
 
     axum::serve(listener, app).await.unwrap_or_else(|e| {
-        error!("Failed to start axum: {}", e.to_string());
+        error!("failed to start axum: {}", e.to_string());
         exit(1);
     });
-
-    Ok(())
 }
 
 fn parse_db_uri() -> String {

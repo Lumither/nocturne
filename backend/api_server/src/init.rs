@@ -1,5 +1,7 @@
-use crate::logger;
 use std::env;
+
+use crate::logger;
+
 use tracing_appender::non_blocking::WorkerGuard;
 
 pub fn logger_init() -> (WorkerGuard, WorkerGuard) {

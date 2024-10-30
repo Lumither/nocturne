@@ -3,5 +3,6 @@ resolver = "2"
 members = [
     "api_server",
     "constants",
-    "markdown"
+    "macros",
+    "markdown",
 ]

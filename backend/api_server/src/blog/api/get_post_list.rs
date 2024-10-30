@@ -1,4 +1,5 @@
-use crate::constants::PAGE_SIZE;
+use constants::blog::PAGE_SIZE;
+
 use axum::{extract::Query, extract::State, http::StatusCode, Json};
 use chrono::{DateTime, Utc};
 use futures::future::join_all;

@@ -1,12 +1,11 @@
-use std::str::FromStr;
-
 use axum::{
     extract::{Path, State},
     http::StatusCode,
     Json,
 };
 use serde_json::{json, Value};
-use sqlx::{Error, PgPool, query, Row};
+use sqlx::{query, Error, PgPool, Row};
+use std::str::FromStr;
 use tracing::error;
 use uuid::Uuid;
 
