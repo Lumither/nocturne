@@ -1,4 +1,4 @@
-use crate::blog::{
+use crate::{
     scheduler::scheduler_error::SchedulerError,
     scheduler::scheduler_error::SchedulerError::IdAlreadyRunning,
     scheduler::scheduler_error::SchedulerError::IdNotFound, scheduler::sleeper::SkippableSleeper,
@@ -163,8 +163,8 @@ impl Scheduler {
 
 #[cfg(test)]
 mod tests {
-    use crate::blog::scheduler::tasks::basic::BasicTask;
-    use crate::blog::scheduler::Scheduler;
+    use crate::scheduler::tasks::basic::BasicTask;
+    use crate::scheduler::Scheduler;
     use std::error::Error;
     use std::thread;
     use std::time::Duration;

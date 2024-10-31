@@ -1,5 +1,4 @@
 mod api;
-mod scheduler;
 
 use crate::blog::api::{
     get_page_count::get_page_count, get_post::get_post, get_post_list::get_post_list,

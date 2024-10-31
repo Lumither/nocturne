@@ -54,7 +54,7 @@ impl From<DateTime<Utc>> for SkippableSleeper {
 
 #[cfg(test)]
 mod test {
-    use crate::blog::scheduler::sleeper::SkippableSleeper;
+    use crate::scheduler::sleeper::SkippableSleeper;
     use std::thread;
     use std::time::Duration;
 

@@ -1,5 +1,5 @@
-use crate::blog::scheduler::task_func::TaskFunc;
-use crate::blog::scheduler::tasks::Task;
+use crate::scheduler::task_func::TaskFunc;
+use crate::scheduler::tasks::Task;
 use chrono::{DateTime, Utc};
 use cron::Schedule;
 use std::error::Error;

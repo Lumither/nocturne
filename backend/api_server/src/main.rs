@@ -1,6 +1,7 @@
 mod blog;
 mod init;
 mod logger;
+mod scheduler;
 mod server;
 
 #[tokio::main]

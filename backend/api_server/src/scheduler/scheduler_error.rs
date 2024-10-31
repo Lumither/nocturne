@@ -1,4 +1,4 @@
-use crate::blog::scheduler::scheduler_error::SchedulerError::MutexPoison;
+use crate::scheduler::scheduler_error::SchedulerError::MutexPoison;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 use std::sync::PoisonError;
