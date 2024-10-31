@@ -7,6 +7,7 @@ use crate::{
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::RwLock;
 use std::{collections::HashMap, sync::Arc, thread};
+use tracing::log::error;
 use uuid::Uuid;
 
 pub mod scheduler_error;
@@ -23,7 +24,6 @@ struct TaskStatus {
 pub struct Scheduler {
     tasks: Arc<RwLock<HashMap<Uuid, Arc<Box<dyn Task>>>>>,
     running: Arc<RwLock<HashMap<Uuid, Arc<TaskStatus>>>>,
-    stopped: Arc<RwLock<Vec<Uuid>>>,
 }
 
 impl Scheduler {
@@ -40,7 +40,6 @@ impl Scheduler {
 
     fn run_task(
         running: Arc<RwLock<HashMap<Uuid, Arc<TaskStatus>>>>,
-        stopped: Arc<RwLock<Vec<Uuid>>>,
         id: Uuid,
         task: Arc<Box<dyn Task>>,
     ) -> Result<(), SchedulerError> {
@@ -69,7 +68,6 @@ impl Scheduler {
                             let mut running_lock_guard = running.write()?;
                             running_lock_guard.remove(&id);
                         }
-                        stopped.write()?.push(id);
                         return Ok(());
                     } else {
                         let sleeper = Arc::from(SkippableSleeper::from(next_execution));
@@ -89,7 +87,7 @@ impl Scheduler {
                     }
                 }
             } else {
-                stopped.write()?.push(id);
+                error!("unexpected error ");
                 break;
             }
         }
@@ -100,7 +98,7 @@ impl Scheduler {
     pub fn run(&self, id: &Uuid) -> Result<(), SchedulerError> {
         let id = id.to_owned();
         if let Some(task) = self.tasks.read()?.get(&id) {
-            Self::run_task(self.running.clone(), self.stopped.clone(), id, task.clone())
+            Self::run_task(self.running.clone(), id, task.clone())
         } else {
             Err(IdNotFound)
         }
@@ -110,9 +108,8 @@ impl Scheduler {
         let id = id.to_owned();
         if let Some(task) = self.tasks.read()?.get(&id) {
             let running_clone = self.running.clone();
-            let stopped_clone = self.stopped.clone();
             let task_clone = task.clone();
-            thread::spawn(move || Self::run_task(running_clone, stopped_clone, id, task_clone));
+            thread::spawn(move || Self::run_task(running_clone, id, task_clone));
             Ok(())
         } else {
             Err(IdNotFound)
@@ -174,11 +171,16 @@ mod tests {
         let scheduler = Scheduler::default();
         let task = BasicTask::new(|| println!("test print"), "* * * * * *")?;
         let id = scheduler.insert(Box::new(task))?;
-        scheduler.run_non_blocking(&id)?;
-        thread::sleep(Duration::from_secs(4));
-        scheduler.stop(&id)?;
-        // test termination
-        thread::sleep(Duration::from_secs(5));
+        for i in 1..=2 {
+            println!("Loop {} start", i);
+            println!("Run {}", i);
+            scheduler.run_non_blocking(&id)?;
+            thread::sleep(Duration::from_secs(4));
+            scheduler.stop(&id)?;
+            println!("Stop {}", i);
+            thread::sleep(Duration::from_secs(2));
+            println!("Loop {} finished", i);
+        }
         Ok(())
     }
 }
