@@ -60,7 +60,7 @@ tags: [ "test1", "test2" ]
 
     #[test]
     fn test_front_matter_parser() {
-        parse_front_matter(
+        dbg!(parse_front_matter(
             r##"---
 title: test_title
 date: 0000-00-00+0000
@@ -71,7 +71,7 @@ summary: summary
 tags: [ "test1", "test2" ]
 ---
 "##,
-        )
+        ))
         .expect("Failed to parse front matter");
     }
 }

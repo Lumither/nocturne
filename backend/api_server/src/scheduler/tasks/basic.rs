@@ -11,11 +11,18 @@ pub struct BasicTask {
 }
 
 impl BasicTask {
-    pub fn new(func: fn(), cron_expr: &str) -> Result<Self, Box<dyn Error>> {
+    pub fn new<F>(func: F, cron_expr: &str) -> Result<Self, Box<dyn Error>>
+    where
+        F: TaskFunc,
+    {
         Ok(BasicTask {
             schedule: Schedule::from_str(cron_expr)?,
             func: Box::new(func),
         })
+    }
+
+    pub fn to_task(self) -> Box<dyn Task> {
+        Box::new(self)
     }
 }
 

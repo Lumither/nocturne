@@ -156,6 +156,10 @@ impl Scheduler {
         self.tasks.write()?.insert(id, Arc::new(task));
         Ok(id)
     }
+
+    pub fn new() -> Self {
+        Self::default()
+    }
 }
 
 #[cfg(test)]

@@ -9,5 +9,12 @@ async fn main() {
     init::load_env();
     let _guards = init::logger_init();
 
-    server::start().await;
+    // panic!("test");
+
+    match server::start().await {
+        Ok(_) => {}
+        Err(e) => {
+            panic!("server start failed: {}", e);
+        }
+    };
 }

@@ -1,9 +1,12 @@
 use std::env;
+use std::error::Error;
 use std::num::ParseIntError;
 use std::process::exit;
 use std::str::FromStr;
 
 use crate::blog;
+use crate::scheduler::tasks::basic::BasicTask;
+use crate::scheduler::Scheduler;
 use axum::Router;
 use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
@@ -11,7 +14,7 @@ use sqlx::{
 };
 use tracing::{error, info, warn};
 
-pub async fn start() {
+pub async fn start() -> Result<(), Box<dyn Error>> {
     let port: u32 = match env::var("BACKEND_PORT") {
         Ok(value) => value.parse().unwrap_or_else(|e: ParseIntError| {
             warn!("failed to parse BACKEND_PORT: {}", e.to_string());
@@ -35,6 +38,18 @@ pub async fn start() {
         }
     };
 
+    // cron task
+    let scheduler = Scheduler::new();
+    let test_str = "hello world".to_string();
+    // scheduler.insert(
+    //     BasicTask::new(
+    //         move || blog::cron::check_update::task(test_str.clone()),
+    //         "* * * * * *",
+    //     )?
+    //     .to_task(),
+    // )?;
+
+    // http server
     let app = Router::new()
         .nest("blog", blog::get_router())
         .with_state(db_pool);
@@ -50,6 +65,7 @@ pub async fn start() {
         error!("failed to start axum: {}", e.to_string());
         exit(1);
     });
+    Ok(())
 }
 
 fn parse_db_uri() -> String {
