@@ -5,14 +5,13 @@ use std::process::exit;
 use std::str::FromStr;
 
 use crate::blog;
-use crate::scheduler::tasks::basic::BasicTask;
-use crate::scheduler::Scheduler;
 use axum::Router;
+use macros::panic_with_log;
 use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
     ConnectOptions,
 };
-use tracing::{error, info, warn};
+use tracing::{error, info, warn, Level};
 
 pub async fn start() -> Result<(), Box<dyn Error>> {
     let port: u32 = match env::var("BACKEND_PORT") {
@@ -39,8 +38,8 @@ pub async fn start() -> Result<(), Box<dyn Error>> {
     };
 
     // cron task
-    let scheduler = Scheduler::new();
-    let test_str = "hello world".to_string();
+    // let scheduler = Scheduler::new();
+    // let test_str = "hello world".to_string();
     // scheduler.insert(
     //     BasicTask::new(
     //         move || blog::cron::check_update::task(test_str.clone()),
@@ -51,15 +50,23 @@ pub async fn start() -> Result<(), Box<dyn Error>> {
 
     // http server
     let app = Router::new()
-        .nest("blog", blog::get_router())
+        .nest("/blog", blog::get_router())
         .with_state(db_pool);
 
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
-        .await
-        .unwrap_or_else(|e| {
-            error!("failed to build TCP listener: {}", e.to_string());
-            exit(1);
-        });
+    let listener = match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await {
+        Ok(listener) => {
+            info!("server started on 0.0.0.0:{}", port);
+            listener
+        }
+        Err(e) => {
+            panic_with_log!(
+                Level::ERROR,
+                "failed to start server on 0.0.0.0:{}: {}",
+                port,
+                e.to_string()
+            );
+        }
+    };
 
     axum::serve(listener, app).await.unwrap_or_else(|e| {
         error!("failed to start axum: {}", e.to_string());

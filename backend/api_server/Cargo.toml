@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+macros = { path = "../macros" }
 constants = { path = "../constants" }
 chrono = { version = "0.4.38", features = ["serde", "alloc"] }
 tracing = "0.1.40"
