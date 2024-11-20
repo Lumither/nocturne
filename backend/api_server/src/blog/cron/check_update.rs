@@ -1,5 +1,6 @@
-use dirs::home_dir;
 use std::env;
+
+use dirs::home_dir;
 
 pub fn task() {
     // get dir

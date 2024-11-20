@@ -2,6 +2,7 @@ use std::path::Path;
 use std::{env, io};
 
 use chrono::Local;
+use constants::config::general::{default_value, var_name};
 use dirs::home_dir;
 use tracing::info;
 use tracing_appender::{non_blocking, non_blocking::WorkerGuard, rolling};
@@ -25,33 +26,26 @@ impl FormatTime for LocalTimer {
 type _LogWriter = dyn for<'writer> MakeWriter<'writer, Writer = dyn io::Write + 'static> + 'static;
 
 pub fn init() -> (WorkerGuard, WorkerGuard) {
-    let log_path = &env::var("LOG_ROOT_DIR").unwrap_or_else(|e| {
-        if let Ok(default_log_path) = env::var("WORK_DIR") {
-            if default_log_path.starts_with('~') {
-                let home_path = home_dir()
-                    .expect("[fatal] unable to locate home dir with parsing env `WORK_DIR`, try to use absolute path instead");
-                home_path
-                    .join(default_log_path.strip_prefix("~/").unwrap())
-                    .into_os_string()
-                    .into_string()
-                    .expect("[fatal] failed to parse env `WORK_DIR`, try to use absolute path instead")
+    let log_path = match env::var(var_name::LOG_DIR) {
+        Ok(path) => Path::new(&path).to_path_buf(),
+        Err(_) => {
+            let path = if let Ok(default_log_path) = env::var(var_name::WORK_DIR) {
+                expand_home_path(default_log_path)
             } else {
-                default_log_path
-            }
-        } else {
-            panic!("[fatal] failed to parse env `LOG_ROOT_DIR`: {}", e);
+                let fallback_path = expand_home_path(default_value::WORK_DIR.to_string());
+                println!(
+                    "[warn] unset env var `{}` and `{}`, trying to log on fallback path: {}/log",
+                    var_name::LOG_DIR,
+                    var_name::WORK_DIR,
+                    fallback_path
+                );
+                fallback_path
+            };
+            Path::new(&path).join("log")
         }
-    });
-
-    let log_path = Path::new(log_path)
-        .join("log")
-        .join("backend")
-        .into_os_string()
-        .into_string()
-        .unwrap_or_else(|e| panic!("[fatal] failed to parse {:?}", e));
+    };
 
     let (info_log_writer, info_guard) = non_blocking(rolling::never(&log_path, "info.log"));
-
     let (err_log_writer, error_guard) = non_blocking(rolling::never(&log_path, "error.log"));
 
     let info_format = tracing_subscriber::fmt::format()
@@ -69,9 +63,6 @@ pub fn init() -> (WorkerGuard, WorkerGuard) {
         .with_target(true)
         .with_source_location(true)
         .with_timer(LocalTimer);
-
-    // let default_filter = tracing_subscriber::filter::EnvFilter::try_from_default_env()
-    //     .unwrap_or_else(|_| "tower_http=debug,axum::rejection=trace".into());
 
     let subscribers = Registry::default()
         .with(
@@ -95,8 +86,21 @@ pub fn init() -> (WorkerGuard, WorkerGuard) {
     tracing::subscriber::set_global_default(subscribers)
         .expect("[fatal] failed to setup logging system");
 
-    info!("module started: logger");
-    info!("logging to dir: {}", log_path);
+    info!("logging to dir: {}", log_path.to_str().unwrap());
 
     (info_guard, error_guard)
+}
+
+fn expand_home_path(path: String) -> String {
+    if path.starts_with('~') {
+        let home_path = home_dir()
+            .unwrap_or_else(|| panic!("[fatal] unable to locate home dir when parsing env `{}`, try to use absolute path instead", var_name::WORK_DIR));
+        home_path
+            .join(path.strip_prefix("~/").unwrap())
+            .into_os_string()
+            .into_string()
+            .unwrap()
+    } else {
+        path
+    }
 }
