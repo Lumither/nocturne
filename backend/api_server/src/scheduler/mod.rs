@@ -157,6 +157,10 @@ impl Scheduler {
         Ok(id)
     }
 
+    pub fn insert_list(&self, tasks: Vec<Box<dyn Task>>) -> Result<Vec<Uuid>, SchedulerError> {
+        tasks.into_iter().map(|t| self.insert(t)).collect()
+    }
+
     pub fn new() -> Self {
         Self::default()
     }

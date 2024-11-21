@@ -1,3 +1,4 @@
+mod cron;
 mod database;
 pub mod logger;
 pub mod server;
@@ -22,6 +23,7 @@ pub fn load_env() {
 }
 
 pub async fn start() {
+    // connect database
     let db_pool = match database::init().await {
         Ok(pool) => {
             info!("database connection pool initialized");
@@ -36,6 +38,12 @@ pub async fn start() {
         }
     };
 
+    // schema init
+
+    // load cron task
+    cron::start();
+
+    // api serve
     match server::start(db_pool).await {
         Ok(_) => {}
         Err(e) => {
