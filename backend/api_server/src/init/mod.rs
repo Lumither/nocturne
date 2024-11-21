@@ -1,6 +1,7 @@
 mod cron;
 mod database;
 pub mod logger;
+mod schema;
 pub mod server;
 
 use macros::panic_with_log;
@@ -39,9 +40,10 @@ pub async fn start() {
     };
 
     // schema init
+    schema::init(&db_pool).await;
 
     // load cron task
-    cron::start();
+    cron::start(db_pool.clone());
 
     // api serve
     match server::start(db_pool).await {

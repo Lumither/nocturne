@@ -1,4 +1,6 @@
-pub fn task() {
+use sqlx::{Pool, Postgres};
+
+pub fn task(db_connection: &Pool<Postgres>) {
     // get dir
     // let git_work_dir_path = &env::var("GIT_WORK_DIR").unwrap_or_else(|e| {
     //     if let Ok(default_log_path) = env::var("WORK_DIR") {

@@ -15,11 +15,11 @@ use crate::utils::front_matter::{parse_front_matter, split_md_front_matter};
 
 #[derive(Default, Debug, Serialize)]
 pub struct MdFile {
-    file_id: Uuid,
-    file_name: String,
-    meta: Value,
-    content: String,
-    hash: String,
+    pub file_id: Uuid,
+    pub file_name: String,
+    pub meta: Value,
+    pub content: String,
+    pub hash: String,
 }
 
 impl MdFile {
