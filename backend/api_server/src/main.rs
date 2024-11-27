@@ -1,6 +1,7 @@
 mod blog;
 mod init;
 mod scheduler;
+mod utils;
 
 #[tokio::main]
 async fn main() {

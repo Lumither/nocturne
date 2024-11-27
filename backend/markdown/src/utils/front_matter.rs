@@ -16,8 +16,12 @@ pub fn split_md_front_matter(raw_file: String) -> (String, String) {
 }
 
 pub fn parse_front_matter(front_matter: &str) -> Result<Value, Box<dyn Error>> {
-    let parsed_f_matter = YamlLoader::load_from_str(front_matter)?[0].clone();
-    Ok(Value::from(yaml_to_serde(&parsed_f_matter)))
+    let parsed_f_matter = YamlLoader::load_from_str(front_matter)?;
+    if parsed_f_matter.is_empty() {
+        Ok(Value::String(String::new()))
+    } else {
+        Ok(yaml_to_serde(&parsed_f_matter[0]))
+    }
 }
 
 #[cfg(test)]

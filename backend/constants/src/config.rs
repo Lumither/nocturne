@@ -35,9 +35,14 @@ pub mod general {
     pub mod var_name {
         pub const LOG_DIR: &str = "LOG_DIR";
         pub const WORK_DIR: &str = "WORK_DIR";
+        pub const BLOG_GIT_URL: &str = "BLOG_GIT_URL";
+        pub const BLOG_GIT_REMOTE_BRANCH: &str = "BLOG_GIT_REMOTE_BRANCH";
+        pub const BLOG_GIT_REMOTE_NAME: &str = "BLOG_GIT_REMOTE_NAME";
     }
 
     pub mod default_value {
         pub const WORK_DIR: &str = "~/.nocturne";
+        pub const BLOG_GIT_REMOTE_BRANCH: &str = "master";
+        pub const BLOG_GIT_REMOTE_NAME: &str = "origin";
     }
 }

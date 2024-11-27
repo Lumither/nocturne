@@ -1,6 +1,7 @@
 mod cron;
 mod database;
 pub mod logger;
+mod misc;
 mod schema;
 pub mod server;
 
@@ -24,6 +25,8 @@ pub fn load_env() {
 }
 
 pub async fn start() {
+    misc::init();
+
     // connect database
     let db_pool = match database::init().await {
         Ok(pool) => {
