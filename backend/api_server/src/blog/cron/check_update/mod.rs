@@ -111,7 +111,9 @@ pub fn task(db_connection: &Pool<Postgres>) {
                                     }
                                 }
                             } else if let Some(path) = &update.new_path {
-                                if path.extension().is_some_and(|ext| ext == "md") {
+                                if path.components().any(|comp| comp.as_os_str() == "posts")
+                                    && path.extension().is_some_and(|ext| ext == "md")
+                                {
                                     update_md.push(path.to_path_buf());
                                 }
                             }
@@ -132,7 +134,7 @@ pub fn task(db_connection: &Pool<Postgres>) {
             match Repository::clone(&git_url, &git_work_dir) {
                 Ok(_repo) => {
                     // full repo index
-                    let files = search_md(git_work_dir);
+                    let files = search_md(git_work_dir.join("posts"));
                     index_files(&files, db_connection);
                 }
                 Err(e) => {

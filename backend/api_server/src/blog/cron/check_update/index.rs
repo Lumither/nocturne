@@ -295,10 +295,28 @@ $$ LANGUAGE plpgsql;
 pub async fn index_file(path: &Path, db_conn: &Pool<Postgres>) -> Result<(), Box<dyn Error>> {
     let md_file = MdFile::from_file(path)?;
 
-    base(db_conn, &md_file).await?;
-    tag(db_conn, &md_file).await?;
-    meta(db_conn, &md_file).await?;
-    hash(db_conn, &md_file).await?;
+    async fn trail(db_conn: &Pool<Postgres>, md_file: &MdFile) -> Result<(), PostIdxError> {
+        base(db_conn, md_file).await?;
+        tag(db_conn, md_file).await?;
+        meta(db_conn, md_file).await?;
+        hash(db_conn, md_file).await.map(|_| ())
+    }
+    let mut cnt = 5;
+
+    while let Err(e) = trail(db_conn, &md_file).await {
+        match e {
+            PostIdxError::DBWriteFailure { .. } => {
+                cnt -= 1;
+            }
+            PostIdxError::DBReadFailure { .. } => {
+                cnt -= 1;
+            }
+            _ => return Err(e.into()),
+        }
+        if cnt <= 0 {
+            return Err(e.into());
+        }
+    }
 
     info!("indexed markdown file: {}", path.display());
     Ok(())
