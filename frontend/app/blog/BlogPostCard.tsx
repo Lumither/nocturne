@@ -18,7 +18,7 @@ function BlogPostCard({ post }: Props) {
     // let last_update = new Date((post as any)['last_update']);
     let first_update = new Date((post as any)['first_update']);
     let post_id = (post as any)['post_id'];
-    let header_img = (post as any)['header_img'];
+    let header_img = ((post as any)['header_img'] as string | null);
 
     return (
 
@@ -29,7 +29,7 @@ function BlogPostCard({ post }: Props) {
                   isHoverable
             >
 
-                { header_img !== '' && <div className={ `w-full overflow h-80 relative` }>
+                { header_img && <div className={ `w-full overflow h-80 relative` }>
                     <Image
                         alt={ 'cover picture' }
                         src={ header_img }
@@ -48,7 +48,7 @@ function BlogPostCard({ post }: Props) {
 
                 <CardBody className={ `overflow-visible` }>
                     <div className={ `flex flex-row justify-between` }>
-                        <div className={ `mx-2 ${ header_img !== '' ? '-mt-6' : 'mt-2' }` }>
+                        <div className={ `mx-2 ${ header_img ? '-mt-6' : 'mt-2' }` }>
                             <Chip className={ `mb-2 z-30 text-lg` } radius={ `sm` } size={ 'lg' } color={ `secondary` }
                                   variant={ `solid` }>{ category }</Chip>
                             <p className={ `text-4xl font-bold` }> { title }</p>

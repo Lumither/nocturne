@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
     title: 'Lumitherの酒馆',
-    description: '一间位于时间夹缝中的旅馆，静候下一位旅者的到来...'
+    description: '一间位于时间夹缝中的酒馆，静候下一位旅者的到来...'
 };
 
 export default function RootLayout({

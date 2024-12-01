@@ -3,7 +3,11 @@ import PostCard from '@/app/blog/post/[id]/PostCard';
 import { MotionDiv } from '@/app/public/MotionDiv';
 import ButtonGoBack from '@/app/blog/post/[id]/ButtonGoBack';
 
-function BlogReader({ params }: { params: { id: string } }) {
+async function BlogReader({
+    params
+}: {
+    params: Promise<{ id: string }>
+}) {
 
     return (
         <MotionDiv
@@ -13,7 +17,7 @@ function BlogReader({ params }: { params: { id: string } }) {
             transition={ { ease: 'easeInOut', duration: 0.5 } }
         >
             <div className={ `max-w-full` }>
-                <PostCard id={ params.id } />
+                <PostCard id={ (await params).id } />
             </div>
             <div className={ 'mt-3' }>
                 <ButtonGoBack />

@@ -49,9 +49,9 @@ function ThemeSwitcher() {
                         fullWidth
                         isIconOnly={ isMobile }
                     >
-                        { switcherElements.get(currTheme.values().next().value)?.icon }
+                        { switcherElements.get(currTheme.values().next().value as string)?.icon }
                         <p className={ 'hidden lg:block' }>
-                            { switcherElements.get(currTheme.values().next().value)?.display_name }
+                            { switcherElements.get(currTheme.values().next().value as string)?.display_name }
                         </p>
                     </Button>
                 </DropdownTrigger>

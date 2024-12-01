@@ -18,11 +18,11 @@ const Headers = (props: Props) => {
     // let last_update = new Date((post as any)['last_update']);
     let first_update = new Date(post['first_update']);
     // let post_id = (post as any)['post_id'];
-    let header_img = post['header_img'];
+    let header_img = post['meta']['header_img'] as string | null;
 
     return (
         <>
-            { header_img !== '' && <div className={ `w-full overflow h-96 relative` }>
+            { header_img && <div className={ `w-full overflow h-96 relative` }>
                 <Image
                     alt={ 'cover picture' }
                     src={ header_img }
@@ -38,11 +38,11 @@ const Headers = (props: Props) => {
             </div> }
 
             <div
-                className={ header_img !== '' ?
+                className={ header_img ?
                     'mx-8 -mt-16 backdrop-blur transition bg-zinc-300/80 dark:bg-gray-600/25 rounded-2xl z-30'
                     : 'mx-6 mt-6'
                 }>
-                <div className={ header_img !== '' ? `p-4` : 'p-4 pt-2' }>
+                <div className={ header_img ? `p-4` : 'p-4 pt-2' }>
                     <Chip className={ `mb-2` } radius={ `sm` } color={ `secondary` }
                           variant={ `solid` }>{ category }</Chip>
                     <p className={ `text-4xl font-bold` }> { title }</p>
