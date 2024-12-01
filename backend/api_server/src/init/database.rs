@@ -11,7 +11,10 @@ pub async fn init() -> Result<Pool<Postgres>, Box<dyn Error>> {
     let db_connect_option = PgConnectOptions::from_str(&parse_db_uri())
         .unwrap()
         .disable_statement_logging();
-    Ok(PgPoolOptions::new().connect_with(db_connect_option).await?)
+    Ok(PgPoolOptions::new()
+        .max_connections(1) // todo: temporal solution, to be fixed
+        .connect_with(db_connect_option)
+        .await?)
 }
 
 fn parse_db_uri() -> String {

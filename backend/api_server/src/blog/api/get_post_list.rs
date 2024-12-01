@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use constants::blog::PAGE_SIZE;
 
 use axum::{extract::Query, extract::State, http::StatusCode, Json};
@@ -14,6 +16,7 @@ pub struct Params {
     page: Option<u32>,
 }
 
+#[axum::debug_handler]
 pub async fn get_post_list(
     State(db_connection): State<PgPool>,
     Query(params): Query<Params>,
@@ -47,33 +50,72 @@ pub async fn get_post_list(
         }
     };
 
-    let mut res = Map::new();
+    let mut res = Vec::new();
     let posts: Vec<_> = post_list
         .into_iter()
-        .map(|post| analyze_post(&db_connection, post))
+        .map(|post| async { analyze_post(&db_connection, post).await })
         .collect();
-
     let posts = join_all(posts).await;
+    for post in posts {
+        match post {
+            Ok(p) => res.push(p),
+            Err(e) => {
+                return Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json::from(json!(("error", e.to_string()))),
+                ))
+            }
+        }
+    }
 
-    res.insert("posts".to_string(), Value::from(posts));
+    // res.insert("posts".to_string(), Value::from(posts));
     Ok(Json::from(Value::from(res)))
 }
 
-async fn analyze_post(db_connection: &PgPool, post: PgRow) -> Value {
+async fn analyze_post(db_connection: &PgPool, post: PgRow) -> Result<Value, Box<dyn Error + Send>> {
     let post_id: Uuid = post.get("post_id");
     let tags = fetch_post_tags(db_connection, post_id).await;
+    let meta = fetch_post_meta(db_connection, post_id).await.unwrap();
+    let header_img = meta.get("header_img");
+    let last_update = meta.get("last_update");
 
-    json!({
+    Ok(json!({
         "post_id": post_id.to_string(),
         "title": post.get::<String, _>("title"),
         "category": post.get::<String, _>("category"),
-        "header_img": post.get::<String, _>("header_img"),
+        "header_img": header_img,
         "sub_title": post.get::<String, _>("sub_title"),
         "summary": post.get::<String, _>("summary"),
-        "last_update": post.get::<DateTime<Utc>, _>("last_update"),
+        "last_update": last_update,
         "first_update": post.get::<DateTime<Utc>, _>("first_update"),
         "tags": tags,
-    })
+    }))
+}
+
+async fn fetch_post_meta(db_connection: &PgPool, post_id: Uuid) -> Option<Value> {
+    match query(
+        r#"
+SELECT jsonb_strip_nulls(to_jsonb(t.*)) - 'post_id' AS meta
+FROM meta t
+WHERE post_id = $1;
+        "#,
+    )
+    .bind(post_id)
+    .fetch_one(db_connection)
+    .await
+    {
+        Ok(value) => Some(value.get::<Value, _>("meta")),
+        Err(e) => {
+            error!(
+                "Database error on Reading `{}` from table `{}`: <{}>: {}",
+                "post meta data",
+                "meta",
+                post_id.to_string(),
+                e.to_string()
+            );
+            None
+        }
+    }
 }
 
 async fn fetch_post_tags(db_connection: &PgPool, post_id: Uuid) -> Vec<String> {

@@ -2,15 +2,15 @@ import PostList from '@/app/blog/PostList';
 import Pagination from '@/app/blog/Pagination';
 import { fetchNocturneApi } from '@/app/blog/api';
 
-async function Blog({ searchParams }: {
-    searchParams?: {
-        page?: number
-    };
+async function Blog({
+    searchParams
+}: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
 
-    const parsePage = Number(searchParams?.page);
+    const parsePage = Number((await searchParams)?.page);
     const currPage = parsePage > 0 ? parsePage : 1;
-    const ret = await fetchNocturneApi(`/get_page_count`);
+    const ret = await fetchNocturneApi(`/blog/get_page_count`);
     const pageCount = (await ret.json() as any)['res'] as number;
 
     return (

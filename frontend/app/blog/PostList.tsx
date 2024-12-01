@@ -8,8 +8,8 @@ import { Card, CardBody } from '@nextui-org/card';
 
 const PostList = async ({ page }: { page: number }) => {
     try {
-        const res = await fetchNocturneApi(`/get_post_list?page=${ page }`);
-        let posts = (await res.json() as any)['posts'];
+        const res = await fetchNocturneApi(`/blog/get_post_list?page=${ page }`);
+        const posts = await res.json();
         return (
             // blog list
             <div className={ 'w-full' }>

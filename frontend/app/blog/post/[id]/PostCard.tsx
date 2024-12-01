@@ -13,7 +13,7 @@ async function PostCard(props: Props) {
 
 
     try {
-        const res = await fetchNocturneApi(`/get_post/${ props.id }`);
+        const res = await fetchNocturneApi(`/blog/get_post/${ props.id }`);
         const ret: any = await res.json();
         return (
             <div>
