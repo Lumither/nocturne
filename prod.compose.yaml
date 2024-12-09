@@ -1,0 +1,38 @@
+services:
+  frontend:
+    depends_on:
+      - backend
+    build:
+      context: ./frontend
+      dockerfile: ../container/release/frontend.containerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env
+
+
+  backend:
+    depends_on:
+      - postgres
+    build:
+      context: ./backend
+      dockerfile: ../container/release/backend.containerfile
+      args:
+        ARCH: ${ARCH}
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./.env
+      - ./.env.local
+    dns:
+      - 1.1.1.1
+
+  postgres:
+    image: postgres:16.3
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env
+      - ./.env.local

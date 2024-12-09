@@ -1,11 +1,11 @@
 services:
   frontend:
     build:
-      context: ./frontend 
+      context: ./frontend
       dockerfile: ../container/dev/frontend.containerfile
     restart: always
     ports:
-      - 3000:3000
+      - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -14,15 +14,15 @@ services:
       - ./container/dev/.env
     dns:
       - 1.1.1.1
-    
-    
+
+
   backend:
-    build: 
-      context: ./backend 
+    build:
+      context: ./backend
       dockerfile: ../container/dev/backend.containerfile
     restart: always
     ports:
-      - 3001:3001
+      - "3001:3001"
     volumes:
       - ./blog_posts_git:/app/blog_posts_git:ro
     env_file:

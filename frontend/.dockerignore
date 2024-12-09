@@ -1,7 +1,7 @@
 /node_modules
 
-/.next/
-/out/
+/.next
+/out
 /build
 
 .DS_Store
