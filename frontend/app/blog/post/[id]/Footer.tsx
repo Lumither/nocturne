@@ -17,7 +17,7 @@ const Footer = (props: Props) => {
     const author = post['meta']['author'] ?? 'Tao';
     const author_link = post['meta']['author_link'] ?? '/about';
     const post_date = new Date(post['first_update']);
-    const update_date = new Date(post['last_update']);
+    const update_date: Date | undefined = post['last_update'] ? new Date(post['last_update']) : undefined;
     const cc = post['meta']['cc'] ?? 'by-nc-sa';
 
 
@@ -55,14 +55,16 @@ const Footer = (props: Props) => {
                                     year: `numeric`
                                 }) }</p>
                             </div>
-                            <div>
-                                <p className={ 'text-lg font-bold' }>Updated on</p>
-                                <p>{ update_date.toLocaleString('default', {
-                                    month: `long`,
-                                    day: `numeric`,
-                                    year: `numeric`
-                                }) }</p>
-                            </div>
+                            { update_date &&
+                                <div>
+                                    <p className={ 'text-lg font-bold' }>Updated on</p>
+                                    <p>{ update_date.toLocaleString('default', {
+                                        month: `long`,
+                                        day: `numeric`,
+                                        year: `numeric`
+                                    }) }</p>
+                                </div>
+                            }
                             <div>
                                 <p className={ 'text-lg font-bold' }>Published under</p>
                                 <Link href={ `https://creativecommons.org/licenses/${ cc }/4.0/` }>
