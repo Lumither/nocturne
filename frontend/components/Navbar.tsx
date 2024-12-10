@@ -3,7 +3,16 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@nextui-org/react';
 import Image from 'next/image';
-import { IoHome, IoInformationCircle, IoLink, IoLogoGithub, IoMail, IoPencil, IoSearch } from 'react-icons/io5';
+import {
+    IoFlask,
+    IoHome,
+    IoInformationCircle,
+    IoLink,
+    IoLogoGithub,
+    IoMail,
+    IoPencil,
+    IoSearch
+} from 'react-icons/io5';
 import Link from 'next/link';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { usePathname } from 'next/navigation';
@@ -34,6 +43,10 @@ const entries: { display_name: string; href: string; icon: React.ReactNode }[] =
         icon: <IoSearch size={ `20px` }></IoSearch>,
         display_name: 'Search',
         href: '/search'
+    }, {
+        icon: <IoFlask size={ '20px' } />,
+        display_name: 'Lab',
+        href: 'https://lab.lmt.moe'
     }
 ];
 
@@ -51,18 +64,6 @@ const connections: { label: string, href: string, icon: React.ReactNode }[] = [
 ];
 
 function Navbar() {
-    // const [ scrolled, setScrolled ] = useState(false);
-    // useEffect(() => {
-    //     const handleScroll = () => {
-    //         const isScrolled = window.scrollY > 0;
-    //         setScrolled(isScrolled);
-    //     };
-    //     window.addEventListener('scroll', handleScroll);
-    //     return () => {
-    //         window.removeEventListener('scroll', handleScroll);
-    //     };
-    // }, []);
-
 
     const path = usePathname();
     const [ shownPath, setShownPath ] = useState(path);
