@@ -1,4 +1,5 @@
 use std::env;
+use std::error::Error;
 use std::fs::remove_dir_all;
 use std::path::{Path, PathBuf};
 
@@ -89,24 +90,22 @@ pub fn task(db_connection: &Pool<Postgres>) {
                         for update in updates {
                             if [Delta::Deleted, Delta::Untracked].contains(&update.status) {
                                 if let Some(path) = &update.old_path {
-                                    if drop_index(
+                                    match drop_index(
                                         &get_md_file_basename(
                                             path.file_name().unwrap().to_str().unwrap(),
                                         ),
                                         db_connection,
-                                    )
-                                    .is_ok()
-                                    {
-                                        info!(
+                                    ) {
+                                        Ok(_) => info!(
                                             "blog content git({}) file `{}` is detected as deleted/untracked, index dropped",
                                             &git_url,
                                             &path.display()
-                                        );
-                                    } else {
-                                        error!(
-                                            "blog content git({}) file `{}` is detected as deleted/untracked, failed to drop index",
+                                        ),
+                                        Err(e) => error!(
+                                            "blog content git({}) file `{}` is detected as deleted/untracked, failed to drop index: {}",
                                             &git_url,
-                                            &path.display()
+                                            &path.display(),
+                                            e
                                         )
                                     }
                                 }
@@ -114,7 +113,8 @@ pub fn task(db_connection: &Pool<Postgres>) {
                                 if path.components().any(|comp| comp.as_os_str() == "posts")
                                     && path.extension().is_some_and(|ext| ext == "md")
                                 {
-                                    update_md.push(path.to_path_buf());
+                                    // update_md.push(path.to_path_buf());
+                                    update_md.push(dbg!(path.to_path_buf()));
                                 }
                             }
                         }

@@ -43,10 +43,10 @@ const MinifyPostCard = (props: Props) => {
                 }
                 { !img_url &&
                     <div className={ 'h-full grid p-6 place-content-center' }>
-                        <div className={ 'flex flex-row  items-center text-center max-h-fit' }>
-                            <p className={ 'text-3xl font-bold' }>{ post['title'] }</p>
-                            <div className={ 'h-full w-1 mx-2 bg-zinc-500 dark:bg-zinc-400' }></div>
-                            <p className={ 'text-xl' }>{ post['sub_title'] }</p>
+                        <div className={ 'flex flex-col max-h-fit text-left' }>
+                            <p className={ 'text-3xl font-bold text-balance' }>{ post['title'] }</p>
+                            <div className={ 'w-1/4 h-[2px] my-2 bg-zinc-500 dark:bg-zinc-400' }></div>
+                            <p className={ 'text-xl text-pretty break-words' }>{ post['sub_title'] }</p>
                         </div>
                     </div>
                 }

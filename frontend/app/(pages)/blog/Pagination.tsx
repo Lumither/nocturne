@@ -3,7 +3,7 @@
 import React from 'react';
 import { Pagination as NextUIPagination } from '@nextui-org/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useScreenSizeTrigger } from '@/app/public/screenSizeTrigger';
+import { useScreenSizeTrigger } from '@/app/(pages)/public/screenSizeTrigger';
 
 const Pagination = ({ total }: {
     total: number,

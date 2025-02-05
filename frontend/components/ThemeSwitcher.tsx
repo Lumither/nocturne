@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
 import { MdOutlineDarkMode, MdOutlineDesktopWindows, MdOutlineLightMode } from 'react-icons/md';
-import { useScreenSizeTrigger } from '@/app/public/screenSizeTrigger';
+import { useScreenSizeTrigger } from '@/app/(pages)/public/screenSizeTrigger';
 
 const switcherElements = new Map(
     [

@@ -38,7 +38,7 @@ pub fn search_md(entry: PathBuf) -> Vec<PathBuf> {
 pub fn index_files(files: &[PathBuf], db_conn: &Pool<Postgres>) {
     let rt = Runtime::new().unwrap();
     rt.block_on(async {
-        let files_clone = files.to_owned();
+        let files_clone = dbg!(files).to_owned();
         let handlers = files_clone
             .into_iter()
             .map(|file: PathBuf| {

@@ -1,6 +1,6 @@
-import PostList from '@/app/blog/PostList';
-import Pagination from '@/app/blog/Pagination';
-import { fetchNocturneApi } from '@/app/blog/api';
+import PostList from '@/app/(pages)/blog/PostList';
+import Pagination from '@/app/(pages)/blog/Pagination';
+import { fetchNocturneApi } from '@/app/(pages)/blog/api';
 
 async function Blog({
     searchParams

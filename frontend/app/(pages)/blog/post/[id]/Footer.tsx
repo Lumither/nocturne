@@ -1,24 +1,32 @@
 import React from 'react';
-import MinifyPostCard from '@/app/blog/post/[id]/MinifyPostCard';
+import MinifyPostCard from '@/app/(pages)/blog/post/[id]/MinifyPostCard';
 import Link from 'next/link';
 import { FaCreativeCommons } from 'react-icons/fa6';
 
 type Props = {
-    post: any
+    // post: any
+    post_id: string;
+    adjacent_posts: any
+    perm_link: string | undefined;
+    author: string | undefined;
+    author_link: string | undefined;
+    first_update: string;
+    last_update: string | undefined;
+    cc: string | undefined;
+    title: string;
 }
 
 const Footer = (props: Props) => {
-    const { post } = props;
+    const { adjacent_posts, perm_link, post_id, first_update, last_update, title } = props;
 
-    const adjacent_posts = post['adj'];
-    const prev_post = adjacent_posts['prev'];
-    const next_post = adjacent_posts['next'];
-    const link = post['meta']['link'] ?? `https://lumither.com/blog/post/${ post['meta']['id'] }`;
-    const author = post['meta']['author'] ?? 'Tao';
-    const author_link = post['meta']['author_link'] ?? '/about';
-    const post_date = new Date(post['first_update']);
-    const update_date: Date | undefined = post['last_update'] ? new Date(post['last_update']) : undefined;
-    const cc = post['meta']['cc'] ?? 'by-nc-sa';
+    const prev_post = adjacent_posts.prev;
+    const next_post = adjacent_posts.next;
+    const link = perm_link ?? `https://lumither.com/blog/post/${ post_id }`;
+    const author = props.author ?? 'Tao';
+    const author_link = props.author_link ?? '/about/me';
+    const post_date = new Date(first_update);
+    const update_date: Date | undefined = last_update ? new Date(last_update) : undefined;
+    const cc = props.cc ?? 'by-nc-sa';
 
 
     return (
@@ -35,7 +43,7 @@ const Footer = (props: Props) => {
 
                     <div className={ 'flex flex-col space-y-4 relative' }>
                         <div className={ 'z-[2]' }>
-                            <p className={ 'text-xl font-bold' }>{ post['meta']['title'] }</p>
+                            <p className={ 'text-xl font-bold' }>{ title }</p>
                             <Link href={ link }>
                                 <p className={ 'text-sm underline decoration-indigo-500 dark:decoration-sky-500' }>{ link }</p>
                             </Link>

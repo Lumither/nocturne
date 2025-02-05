@@ -1,5 +1,5 @@
 import React from 'react';
-import MarkdownRenderer from '@/app/public/MarkdownRenderer';
+import MarkdownRenderer from '@/app/(pages)/public/MarkdownRenderer';
 import { fetchText } from '@/app/fetch';
 
 const Website = async () => {
