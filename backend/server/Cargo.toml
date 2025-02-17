@@ -7,8 +7,10 @@ edition = "2021"
 macros = { path = "../macros" }
 
 
-tracing = "0.1.41"
+tracing = { version = "0.1.41", features = ["log"] }
 git2 = "0.20.0"
+chrono = "0.4.39"
+uuid = { version = "1.13.2", features = ["v4"] }
 
 [build-dependencies]
 git2 = "0.20.0"
