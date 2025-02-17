@@ -6,7 +6,7 @@
 /// use macros::panic_with_log;
 /// use tracing::Level;
 ///
-/// panic_with_log!(Level::ERROR, "Test panicked: {}", 42);
+/// panic_with_log!(Level::ERROR, "test panicked: {}", 42);
 /// ```
 #[macro_export]
 macro_rules! panic_with_log {
@@ -14,6 +14,25 @@ macro_rules! panic_with_log {
         use std::process;
         use tracing::event;
         event!($level, $msg $(, $($arg)*)?);
+        process::exit(1);
+    }};
+}
+
+/// log the message with `Level::ERROR` and exit(1)
+///
+/// # Example
+/// ```rust
+///
+/// use macros::error_panic;
+///
+/// error_panic!("test panicked: {}", 42);
+/// ```
+#[macro_export]
+macro_rules! error_panic {
+    ($msg:literal $(, $($arg:tt)*)?) => {{
+        use std::process;
+        use tracing::{event, Level};
+        event!(Level::ERROR, $msg $(, $($arg)*)?);
         process::exit(1);
     }};
 }
