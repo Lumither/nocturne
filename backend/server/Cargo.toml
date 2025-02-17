@@ -1,0 +1,15 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+macros = { path = "../macros" }
+
+
+tracing = "0.1.41"
+git2 = "0.20.0"
+
+[build-dependencies]
+git2 = "0.20.0"
+chrono = "0.4.39"
