@@ -1,9 +1,10 @@
-use crate::scheduler::task_func::TaskFunc;
-use crate::scheduler::tasks::Task;
-use chrono::{DateTime, Utc};
-use cron::Schedule;
 use std::error::Error;
 use std::str::FromStr;
+
+use crate::scheduler::{task_func::TaskFunc, tasks::Task};
+
+use chrono::{DateTime, Utc};
+use cron::Schedule;
 
 pub struct BasicTask {
     schedule: Schedule,
