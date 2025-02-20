@@ -12,7 +12,7 @@ use crate::scheduler::{
         SchedulerError, SchedulerError::IdAlreadyRunning, SchedulerError::IdNotFound,
     },
     sleeper::SkippableSleeper,
-    tasks::Task,
+    tasks::CronTask,
 };
 
 use tracing::log::error;
@@ -30,7 +30,7 @@ struct TaskStatus {
 
 #[derive(Default)]
 pub struct Scheduler {
-    tasks: Arc<RwLock<HashMap<Uuid, Arc<Box<dyn Task>>>>>,
+    tasks: Arc<RwLock<HashMap<Uuid, Arc<Box<dyn CronTask>>>>>,
     running: Arc<RwLock<HashMap<Uuid, Arc<TaskStatus>>>>,
 }
 
@@ -49,7 +49,7 @@ impl Scheduler {
     fn run_task(
         running: Arc<RwLock<HashMap<Uuid, Arc<TaskStatus>>>>,
         id: Uuid,
-        task: Arc<Box<dyn Task>>,
+        task: Arc<Box<dyn CronTask>>,
     ) -> Result<(), SchedulerError> {
         if running.read()?.get(&id).is_some() {
             return Err(IdAlreadyRunning);
@@ -159,13 +159,13 @@ impl Scheduler {
         }
     }
 
-    pub fn insert(&self, task: Box<dyn Task>) -> Result<Uuid, SchedulerError> {
+    pub fn insert(&self, task: Box<dyn CronTask>) -> Result<Uuid, SchedulerError> {
         let id = Uuid::new_v4();
         self.tasks.write()?.insert(id, Arc::new(task));
         Ok(id)
     }
 
-    pub fn insert_list(&self, tasks: Vec<Box<dyn Task>>) -> Result<Vec<Uuid>, SchedulerError> {
+    pub fn insert_list(&self, tasks: Vec<Box<dyn CronTask>>) -> Result<Vec<Uuid>, SchedulerError> {
         tasks.into_iter().map(|t| self.insert(t)).collect()
     }
 

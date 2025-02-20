@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::str::FromStr;
 
-use crate::scheduler::{task_func::TaskFunc, tasks::Task};
+use crate::scheduler::{task_func::TaskFunc, tasks::CronTask};
 
 use chrono::{DateTime, Utc};
 use cron::Schedule;
@@ -22,12 +22,12 @@ impl BasicTask {
         })
     }
 
-    pub fn to_task(self) -> Box<dyn Task> {
+    pub fn to_task(self) -> Box<dyn CronTask> {
         Box::new(self)
     }
 }
 
-impl Task for BasicTask {
+impl CronTask for BasicTask {
     fn get_next_execution(&self) -> Option<DateTime<Utc>> {
         self.schedule.upcoming(Utc).next()
     }
