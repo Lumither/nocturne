@@ -1,7 +1,11 @@
+#[allow(dead_code)]
 mod constants;
+
+#[allow(dead_code)]
+mod scheduler;
+
 mod init;
 mod modules;
-mod scheduler;
 mod utils;
 
 use crate::init::{logger, start};

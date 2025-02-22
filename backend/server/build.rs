@@ -9,7 +9,8 @@ fn main() {
         .peel_to_commit()
         .expect("failed to get HEAD commit");
     let hash = commit.id().to_string();
-    let utc_date = Utc::now().date_naive().format("%Y%m%d").to_string();
-    let build_id = format!("{}@{}", utc_date, &hash[..8]);
+    let utc_timestamp = Utc::now().date_naive().format("%Y%m%d").to_string();
+    let pkg_version = env!("CARGO_PKG_VERSION");
+    let build_id = format!("{}:{}@{}", pkg_version, &hash[..8], utc_timestamp);
     println!("cargo:rustc-env=BUILD_ID={}", build_id);
 }

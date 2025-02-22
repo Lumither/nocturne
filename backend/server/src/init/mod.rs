@@ -1,7 +1,6 @@
 mod database;
 pub mod logger;
 mod misc;
-mod schema;
 
 use std::{env, panic};
 
