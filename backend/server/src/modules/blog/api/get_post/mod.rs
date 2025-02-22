@@ -1,3 +1,5 @@
+use macros::dev_consume;
+
 use axum::response::IntoResponse;
 use axum::{
     extract::{Path, State},
@@ -13,7 +15,7 @@ pub async fn handler(
     State(db_connection): State<PgPool>,
     Path(identifier): Path<String>,
 ) -> impl IntoResponse {
-    let post = if let Ok(id) = identifier.parse::<i64>() {
+    if let Ok(id) = identifier.parse::<i64>() {
         select_post_with_i64_id(&db_connection, id).await
     } else {
         select_post_with_str_id(&db_connection, &identifier).await
@@ -22,9 +24,11 @@ pub async fn handler(
 }
 
 async fn select_post_with_i64_id(db: &PgPool, id: i64) {
+    dev_consume!(db, id);
     todo!()
 }
 
 async fn select_post_with_str_id(db: &PgPool, id: &str) {
+    dev_consume!(db, id);
     todo!()
 }
