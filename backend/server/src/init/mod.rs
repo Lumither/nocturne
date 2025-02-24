@@ -4,7 +4,7 @@ mod misc;
 
 use std::{env, panic};
 
-use crate::modules::{blog::Blog, ModuleTree};
+use crate::modules::{ModuleTree, blog::Blog};
 use macros::error_panic;
 
 use tracing::info;

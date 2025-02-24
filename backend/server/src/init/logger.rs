@@ -8,8 +8,8 @@ use dirs::home_dir;
 use tracing::info;
 use tracing_appender::{non_blocking, non_blocking::WorkerGuard, rolling};
 use tracing_subscriber::{
-    filter::LevelFilter, fmt, fmt::format::Writer, fmt::time::FormatTime, fmt::MakeWriter,
-    layer::SubscriberExt, Layer, Registry,
+    Layer, Registry, filter::LevelFilter, fmt, fmt::MakeWriter, fmt::format::Writer,
+    fmt::time::FormatTime, layer::SubscriberExt,
 };
 
 struct LocalTimer;

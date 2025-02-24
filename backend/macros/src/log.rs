@@ -44,7 +44,7 @@ mod tests {
         use std::io;
         use tracing::Level;
         use tracing_subscriber::prelude::*;
-        use tracing_subscriber::{fmt, Registry};
+        use tracing_subscriber::{Registry, fmt};
 
         let format = tracing_subscriber::fmt::format()
             .with_level(true)

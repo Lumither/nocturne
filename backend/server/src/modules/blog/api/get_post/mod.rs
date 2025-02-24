@@ -2,8 +2,8 @@ use macros::dev_consume;
 
 use axum::response::IntoResponse;
 use axum::{
-    extract::{Path, State},
     Json,
+    extract::{Path, State},
 };
 use serde_json::json;
 use sqlx::PgPool;

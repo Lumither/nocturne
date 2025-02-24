@@ -15,14 +15,14 @@ use crate::{
 use macros::panic_with_log;
 
 use git2::{Delta, Repository};
-use sqlx::{Pool, Postgres};
+use sqlx::{PgPool, Pool, Postgres};
 use tracing::{error, info, warn, Level};
 
 mod error;
 mod index;
 mod utils;
 
-pub fn task(db_connection: &Pool<Postgres>) {
+pub fn task(db_connection: &PgPool) {
     // init
     let git_work_dir = {
         let path = if let Ok(default_log_path) = env::var(var_name::WORK_DIR) {

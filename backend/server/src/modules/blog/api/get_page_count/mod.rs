@@ -1,8 +1,8 @@
 use crate::constants::blog::PAGE_SIZE;
 
-use axum::{extract::State, Json};
-use serde_json::{json, Value};
-use sqlx::{query, PgPool, Row};
+use axum::{Json, extract::State};
+use serde_json::{Value, json};
+use sqlx::{PgPool, Row, query};
 use tracing::error;
 
 const GET_PAGE_COUNT_QUERY: &str = include_str!("post_page_count.sql");
