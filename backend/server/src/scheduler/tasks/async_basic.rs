@@ -1,21 +1,21 @@
 use std::{error::Error, pin::Pin, str::FromStr};
 
-use crate::scheduler::{task_func::TaskFunc, tasks::CronTask};
+use crate::{scheduler::task_func::AsyncTaskFunc, scheduler::tasks::CronTask};
 
 use chrono::{DateTime, Utc};
 use cron::Schedule;
 
-pub struct BasicTask {
+pub struct AsyncBasic {
     schedule: Schedule,
-    func: Box<dyn TaskFunc>,
+    func: Box<dyn AsyncTaskFunc>,
 }
 
-impl BasicTask {
+impl AsyncBasic {
     pub fn new<F>(func: F, cron_expr: &str) -> Result<Self, Box<dyn Error>>
     where
-        F: TaskFunc,
+        F: AsyncTaskFunc,
     {
-        Ok(BasicTask {
+        Ok(AsyncBasic {
             schedule: Schedule::from_str(cron_expr)?,
             func: Box::new(func),
         })
@@ -26,12 +26,12 @@ impl BasicTask {
     }
 }
 
-impl CronTask for BasicTask {
+impl CronTask for AsyncBasic {
     fn get_next_execution(&self) -> Option<DateTime<Utc>> {
         self.schedule.upcoming(Utc).next()
     }
 
-    fn call(&self) -> Pin<Box<dyn Future<Output = ()> + Send + '_>> {
-        Box::pin(async { (self.func)() })
+    fn call(&self) -> Pin<Box<(dyn Future<Output = ()> + Send)>> {
+        Box::pin((self.func)())
     }
 }

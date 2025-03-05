@@ -3,7 +3,6 @@ mod cron;
 
 use crate::{
     modules::{
-        Module,
         blog::{
             api::{
                 get_page_count,
@@ -12,11 +11,12 @@ use crate::{
             },
             // cron::check_update,
         },
+        Module,
     },
-    scheduler::tasks::CronTask,
+    scheduler::tasks::{async_basic::AsyncBasic, CronTask},
 };
 
-use axum::{Router, routing::get};
+use axum::{routing::get, Router};
 use sqlx::PgPool;
 
 const MOUNT_POINT: &str = "/blog";
@@ -47,6 +47,9 @@ impl Module for Blog {
             // BasicTask::new(move || check_update::task(&db_handler), "0/15 * * * * *")
             //     .unwrap()
             //     .to_task(),
+            AsyncBasic::new(|| Box::pin(async { println!("test") }), "* * * * * *")
+                .unwrap()
+                .to_task(),
         ]
     }
 }

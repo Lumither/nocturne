@@ -5,11 +5,12 @@ use std::num::ParseIntError;
 
 use crate::{
     constants::config::server::{default_value, var_name},
-    scheduler::{Scheduler, tasks::CronTask},
+    scheduler::{tasks::CronTask, Scheduler},
 };
 use macros::error_panic;
 
 use axum::Router;
+use tokio::net::TcpListener;
 use tracing::{info, warn};
 
 // todo: merge `get_server_router` & `get_mount_point`, make Option
@@ -51,13 +52,7 @@ impl ModuleTree {
             Err(_) => default_value::PORT,
         };
 
-        let listener = match tokio::net::TcpListener::bind(format!(
-            "{}:{}",
-            default_value::HOST,
-            port
-        ))
-        .await
-        {
+        let listener = match TcpListener::bind(format!("{}:{}", default_value::HOST, port)).await {
             Ok(listener) => {
                 info!("server started on {}:{}", default_value::HOST, port);
                 listener
@@ -76,6 +71,8 @@ impl ModuleTree {
             let _ = scheduler.insert_list(module.get_cron_tasks());
             app = app.nest(module.get_mount_point(), module.get_server_router());
         }
+
+        scheduler.start().unwrap();
 
         axum::serve(listener, app).await.unwrap_or_else(|e| {
             error_panic!("failed to start axum: {}", e.to_string());
