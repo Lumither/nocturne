@@ -41,9 +41,10 @@ impl TaskEntity {
 
     pub async fn run_blocking(&self) {
         loop {
+            self.status.sleeper.read().unwrap().start();
             if self.status.expected_running.load(Ordering::SeqCst) {
-                self.status.sleeper.read().unwrap().start();
                 self.func.call().await;
+
                 if let Some(next_execution) = self.func.get_next_execution() {
                     *(self.status.sleeper.write().unwrap()) = next_execution.into();
                 } else {
@@ -80,18 +81,31 @@ impl Runner {
         let list = &self.task_list.read()?;
         self.rt.block_on(async {
             for (_, entity) in list.iter() {
-                if !entity.status.is_running.load(Ordering::SeqCst)
-                    && entity.status.expected_running.load(Ordering::SeqCst)
-                {
-                    entity.status.is_running.store(true, Ordering::SeqCst);
-                    tokio::spawn({
-                        let entity_clone = entity.clone();
-                        async move { entity_clone.run_blocking().await }
-                    });
-                }
+                self.run_entity(entity.clone()).await
             }
         });
         Ok(())
+    }
+
+    pub fn run_id(&self, id: &Uuid) -> Result<(), SchedulerError> {
+        if let Some(entity) = self.task_list.read()?.get(id).cloned() {
+            self.rt.block_on(async { self.run_entity(entity).await });
+            Ok(())
+        } else {
+            Err(IdNotFound)
+        }
+    }
+
+    pub async fn run_entity(&self, entity: Arc<TaskEntity>) {
+        if !entity.status.is_running.load(Ordering::SeqCst)
+            && entity.status.expected_running.load(Ordering::SeqCst)
+        {
+            entity.status.is_running.store(true, Ordering::SeqCst);
+            tokio::spawn({
+                let entity_clone = entity.clone();
+                async move { entity_clone.run_blocking().await }
+            });
+        }
     }
 
     pub fn add_with_id(
@@ -134,11 +148,12 @@ impl Runner {
     }
 
     pub fn terminate_remove(&self, id: Uuid) -> Result<Arc<Box<dyn CronTask>>, SchedulerError> {
-        match self.task_list.read()?.get(&id) {
+        let mut list = self.task_list.write()?;
+        match list.get(&id) {
             None => Err(IdNotFound),
             Some(task) => {
                 task.terminate();
-                let func = &self.task_list.write()?.remove(&id).unwrap().func;
+                let func = list.remove(&id).unwrap().func.clone();
                 Ok(func.clone())
             }
         }

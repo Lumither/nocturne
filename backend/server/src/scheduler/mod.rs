@@ -19,8 +19,8 @@ pub mod tasks;
 
 #[derive(Default)]
 pub struct Scheduler {
-    running: Arc<RwLock<HashSet<Uuid>>>,
-    parking_pool: Arc<RwLock<HashMap<Uuid, Arc<Box<dyn CronTask>>>>>,
+    running: RwLock<HashSet<Uuid>>,
+    parking_pool: RwLock<HashMap<Uuid, Arc<Box<dyn CronTask>>>>,
     runner: Runner,
 }
 
@@ -47,7 +47,9 @@ impl Scheduler {
         } else if self.parking_pool.read()?.contains_key(id) {
             let func = self.parking_pool.write()?.remove(id).unwrap();
             self.running.write()?.insert(*id);
-            self.runner.add_with_id(func, id)
+            self.runner
+                .add_with_id(func, id)
+                .and_then(|_| self.runner.run_id(id))
         } else {
             Err(IdNotFound)
         }
@@ -55,21 +57,14 @@ impl Scheduler {
 
     /// Stop a task with `id`
     pub fn stop(&self, id: &Uuid) -> Result<(), SchedulerError> {
-        dbg!("stop() called");
         if self.running.read()?.contains(id) {
-            dbg!("b1");
             let func = self.runner.terminate_remove(*id)?;
-            dbg!("b1a");
             self.running.write()?.remove(id);
-            dbg!("b1b");
             self.parking_pool.write()?.insert(*id, func.clone());
-            dbg!("b1c");
             Ok(())
         } else if self.parking_pool.read()?.get(id).is_some() {
-            dbg!("b2");
             Ok(())
         } else {
-            dbg!("b3");
             Err(IdNotFound)
         }
     }
@@ -98,18 +93,16 @@ impl Scheduler {
 
 #[cfg(test)]
 mod tests {
-    use crate::scheduler::tasks::basic::BasicTask;
-    use crate::scheduler::Scheduler;
-    use std::error::Error;
-    use std::thread;
-    use std::time::Duration;
+    use std::{error::Error, thread, time::Duration};
 
-    #[test]
-    fn test_run() -> Result<(), Box<dyn Error>> {
-        let scheduler = Scheduler::default();
-        let task = BasicTask::new(|| println!("test print"), "* * * * * *")?;
-        let id = scheduler.insert(Box::new(task))?;
-        scheduler.start()?;
+    use crate::scheduler::{
+        tasks::{async_basic::AsyncBasic, basic::BasicTask},
+        Scheduler,
+    };
+
+    use uuid::Uuid;
+
+    fn execution(scheduler: Scheduler, id: Uuid) -> Result<(), Box<dyn Error>> {
         for i in 1..=2 {
             println!("Loop {} start", i);
             println!("Run {}", i);
@@ -123,5 +116,26 @@ mod tests {
             println!("Loop {} finished", i);
         }
         Ok(())
+    }
+
+    #[test]
+    fn test_run() -> Result<(), Box<dyn Error>> {
+        let scheduler = Scheduler::default();
+        let task = BasicTask::new(|| println!("test print"), "* * * * * *")?;
+        let id = scheduler.insert(Box::new(task))?;
+        scheduler.start()?;
+        execution(scheduler, id)
+    }
+
+    #[test]
+    fn test_run_async() -> Result<(), Box<dyn Error>> {
+        let scheduler = Scheduler::default();
+        let task = AsyncBasic::new(
+            || Box::pin(async { println!("test async print") }),
+            "* * * * * *",
+        )?;
+        let id = scheduler.insert(Box::new(task))?;
+        scheduler.start()?;
+        execution(scheduler, id)
     }
 }
