@@ -7,7 +7,7 @@ use std::{
 };
 
 use crate::scheduler::{
-    scheduler_error::{SchedulerError, SchedulerError::IdNotFound},
+    error::{SchedulerError, SchedulerError::IdNotFound},
     sleeper::SkippableSleeper,
     tasks::CronTask,
 };

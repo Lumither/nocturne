@@ -4,7 +4,7 @@ use std::{
     sync::PoisonError,
 };
 
-use crate::scheduler::scheduler_error::SchedulerError::MutexPoison;
+use crate::scheduler::error::SchedulerError::MutexPoison;
 
 // todo: refactor with thiserror
 pub enum SchedulerError {

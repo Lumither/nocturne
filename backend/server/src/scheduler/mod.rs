@@ -4,15 +4,15 @@ use std::{
 };
 
 use crate::scheduler::{
+    error::{SchedulerError, SchedulerError::IdNotFound},
     runner::Runner,
-    scheduler_error::{SchedulerError, SchedulerError::IdNotFound},
     tasks::CronTask,
 };
 
 use uuid::Uuid;
 
+pub mod error;
 mod runner;
-pub mod scheduler_error;
 mod sleeper;
 mod task_func;
 pub mod tasks;
