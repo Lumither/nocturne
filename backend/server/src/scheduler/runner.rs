@@ -44,7 +44,6 @@ impl TaskEntity {
             self.status.sleeper.read().unwrap().start();
             if self.status.expected_running.load(Ordering::SeqCst) {
                 self.func.call().await;
-
                 if let Some(next_execution) = self.func.get_next_execution() {
                     *(self.status.sleeper.write().unwrap()) = next_execution.into();
                 } else {
@@ -104,7 +103,9 @@ impl Runner {
             tokio::spawn({
                 let entity_clone = entity.clone();
                 async move { entity_clone.run_blocking().await }
-            });
+            })
+            .await
+            .expect("tokio runtime error");
         }
     }
 
