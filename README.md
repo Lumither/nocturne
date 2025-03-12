@@ -7,7 +7,7 @@ The idea is to build a separate repo that will be served as a database in ideal 
 functionality related to CMS will be hosted by cloudflare worker.
 
 ```bash
-master > tree                                                                 4s 19:32:15
+master > tree
 .
 ├── idx.json
 └── posts
@@ -22,7 +22,7 @@ This is an example of [db repo](https://github.com/Lumither/blog-posts.git).
 
 ```bash
 
-master > cat idx.json                                                         15:08:34
+master > cat idx.json
 {
     "idx": [
         {
@@ -31,7 +31,7 @@ master > cat idx.json                                                         15
         }
     ]
 }
-master > cat ./posts/idx.json                                                 15:09:53
+master > cat ./posts/idx.json
 {
     "idx": [
         {
