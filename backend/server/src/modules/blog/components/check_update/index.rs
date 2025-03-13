@@ -1,12 +1,10 @@
 use std::error::Error;
 use std::path::Path;
 
-use crate::{
-    modules::blog::cron::check_update::utils::get_md_file_basename,
-    modules::blog::cron::check_update::{error::PostIdxError, utils::parse_date},
-};
 use markdown::MdFile;
 
+use crate::modules::blog::components::check_update::utils::get_md_file_basename;
+use crate::modules::blog::components::check_update::{error::PostIdxError, utils::parse_date};
 use sqlx::{query, PgPool, Pool, Postgres, Row};
 use tokio::runtime::Runtime;
 use tracing::{info, warn};
@@ -18,7 +16,7 @@ async fn base(db_connection: &PgPool, post: &MdFile) -> Result<(), PostIdxError>
             return Err(PostIdxError::MissingField {
                 field: "title".to_string(),
                 filename: post.filename.clone(),
-            })
+            });
         }
         Some(title) => title.as_str().unwrap_or_else(|| {
             warn!("invalid title for `{}`", &post.filename);
@@ -41,7 +39,7 @@ async fn base(db_connection: &PgPool, post: &MdFile) -> Result<(), PostIdxError>
             return Err(PostIdxError::MissingField {
                 field: "category".to_string(),
                 filename: post.filename.clone(),
-            })
+            });
         }
         Some(title) => title.as_str().unwrap_or_else(|| {
             warn!("invalid category for `{}`", &post.filename);
@@ -58,7 +56,7 @@ async fn base(db_connection: &PgPool, post: &MdFile) -> Result<(), PostIdxError>
                         err_field: last_update.to_string(),
                         filename: post.filename.clone(),
                         msg: e.to_string(),
-                    })
+                    });
                 }
             }
         } else {
@@ -70,7 +68,7 @@ async fn base(db_connection: &PgPool, post: &MdFile) -> Result<(), PostIdxError>
             return Err(PostIdxError::MissingField {
                 field: "date".to_string(),
                 filename: post.filename.clone(),
-            })
+            });
         }
         Some(first_update) => match parse_date(first_update.as_str().unwrap()) {
             Ok(date) => date,
@@ -80,7 +78,7 @@ async fn base(db_connection: &PgPool, post: &MdFile) -> Result<(), PostIdxError>
                     err_field: first_update.to_string(),
                     filename: post.filename.clone(),
                     msg: e.to_string(),
-                })
+                });
             }
         },
     };
@@ -137,7 +135,7 @@ async fn tag(db_connection: &PgPool, post: &MdFile) -> Result<(), PostIdxError> 
                 return Err(PostIdxError::MissingField {
                     field: "tags".to_string(),
                     filename: post.filename.clone(),
-                })
+                });
             }
             Some(val) => val,
         };
@@ -173,7 +171,7 @@ async fn tag(db_connection: &PgPool, post: &MdFile) -> Result<(), PostIdxError> 
                         db_table: "Tag".to_string(),
                         id: post_id.to_string(),
                         msg: e.to_string(),
-                    })
+                    });
                 }
             }
         }

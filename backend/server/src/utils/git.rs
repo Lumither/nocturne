@@ -3,10 +3,11 @@
 /// https://github.com/rust-lang/git2-rs/commit/f3b87baed1e33d6c2d94fe1fa6aa6503a071d837
 ///
 use git2::{
-    AnnotatedCommit, AutotagOption, Delta, FetchOptions, Reference, Remote, Repository, build,
+    build, AnnotatedCommit, AutotagOption, Delta, FetchOptions, Reference, Remote, Repository,
 };
 use std::path::PathBuf;
 use tracing::{error, warn};
+
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct FileDelta {
@@ -15,7 +16,6 @@ pub struct FileDelta {
     pub status: Delta,
 }
 
-#[allow(dead_code)]
 fn do_fetch<'a>(
     repo: &'a Repository,
     refs: &[&str],
@@ -30,7 +30,6 @@ fn do_fetch<'a>(
     repo.reference_to_annotated_commit(&fetch_head)
 }
 
-#[allow(dead_code)]
 fn fast_forward(
     repo: &Repository,
     lb: &mut Reference,
@@ -48,7 +47,6 @@ fn fast_forward(
     Ok(())
 }
 
-#[allow(dead_code)]
 fn normal_merge(
     repo: &Repository,
     local: &AnnotatedCommit,
@@ -85,7 +83,6 @@ fn normal_merge(
     Ok(())
 }
 
-#[allow(dead_code)]
 fn do_merge<'a>(
     repo: &'a Repository,
     remote_branch: &str,
@@ -122,7 +119,6 @@ fn do_merge<'a>(
     calculate_diff(repo, &head_commit, &fetch_commit)
 }
 
-#[allow(dead_code)]
 fn calculate_diff(
     repo: &Repository,
     local: &AnnotatedCommit,
@@ -153,7 +149,6 @@ fn calculate_diff(
     Ok(updated_files.into_iter().collect())
 }
 
-#[allow(dead_code)]
 pub fn sync(
     remote_name: &str,
     remote_branch: &str,

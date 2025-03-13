@@ -1,80 +1,81 @@
-use std::{
-    sync::{Arc, Condvar, Mutex},
-    thread,
-    time::Duration,
-};
-
 use chrono::{DateTime, Utc};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::{sync::Arc, time::Duration};
+use tokio::sync::Notify;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Debug, Clone)]
 pub struct SkippableSleeper {
-    pub duration: Duration,
-    state: Arc<(Mutex<bool>, Condvar)>,
+    duration: Duration,
+    skipped: Arc<AtomicBool>,
+    notify: Arc<Notify>,
 }
 
 impl SkippableSleeper {
     pub fn new(duration: Duration) -> Self {
-        SkippableSleeper {
+        Self {
             duration,
-            state: Arc::new((Mutex::new(false), Condvar::new())),
+            skipped: Arc::new(AtomicBool::new(false)),
+            notify: Arc::new(Notify::new()),
         }
     }
 
-    // Blocks until the duration has passed or skip() is called
-    pub fn start(&self) {
-        let (lock, cvar) = &*self.state;
-        let mut received = lock.lock().unwrap();
-        let state_clone = Arc::clone(&self.state);
-        let duration_clone = self.duration;
-        thread::spawn(move || {
-            thread::sleep(duration_clone);
-            let (lock, cvar) = &*state_clone;
-            let mut received = lock.lock().unwrap();
-            *received = true;
-            cvar.notify_one();
-        });
-        while !*received {
-            received = cvar.wait(received).unwrap();
+    pub async fn start(&self) {
+        if self.skipped.load(Ordering::Acquire) {
+            return;
+        }
+
+        let sleep = tokio::time::sleep(self.duration);
+        let notify = self.notify.notified();
+
+        tokio::select! {
+            _ = sleep => {}
+            _ = notify => {
+                self.skipped.store(true, Ordering::Release);
+            }
         }
     }
 
-    // Skip the blocking delay
     pub fn skip(&self) {
-        let (lock, cvar) = &*self.state;
-        let mut received = lock.lock().unwrap();
-        *received = true;
-        cvar.notify_one();
+        self.notify.notify_waiters();
     }
 }
 
 impl From<DateTime<Utc>> for SkippableSleeper {
     fn from(value: DateTime<Utc>) -> Self {
-        let from_utc_timestamp = value.timestamp() as u64;
-        let curr_utc_timestamp = Utc::now().timestamp() as u64;
-        SkippableSleeper::new(Duration::from_secs(from_utc_timestamp - curr_utc_timestamp))
+        let now = Utc::now();
+        let duration = value.signed_duration_since(now);
+        let duration = duration.to_std().unwrap_or(Duration::ZERO);
+        Self::new(duration)
     }
 }
 
 #[cfg(test)]
-mod test {
-    use crate::scheduler::sleeper::SkippableSleeper;
-    use std::thread;
-    use std::time::Duration;
+mod tests {
+    use super::*;
+    use tokio::time::{sleep, Duration};
 
-    #[test]
-    fn usage() {
-        let sleeper = SkippableSleeper::new(Duration::new(10, 0));
-        thread::spawn({
-            let sleeper = sleeper.clone();
-            move || {
-                println!("Sleeping...");
-                sleeper.start();
-                println!("Woke up!");
-            }
+    #[tokio::test]
+    async fn skip_sleeper() {
+        let sleeper = SkippableSleeper::new(Duration::from_secs(10));
+        let sleeper_clone = sleeper.clone();
+
+        let handle = tokio::spawn(async move {
+            println!("Sleeping...");
+            sleeper_clone.start().await;
+            println!("Woke up!");
         });
-        println!("Start Sleeping...");
-        thread::sleep(Duration::from_secs(4));
+
+        println!("Start waiting...");
+        sleep(Duration::from_secs(4)).await;
         println!("Skipping sleep...");
         sleeper.skip();
+
+        handle.await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn normal_sleeper() {
+        let sleeper = SkippableSleeper::new(Duration::from_secs(4));
+        sleeper.start().await;
     }
 }

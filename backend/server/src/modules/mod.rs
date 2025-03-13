@@ -1,7 +1,6 @@
 pub mod blog;
 
-use std::env;
-use std::num::ParseIntError;
+use std::{env, num::ParseIntError, thread};
 
 use crate::{
     constants::config::server::{default_value, var_name},
@@ -10,6 +9,7 @@ use crate::{
 use macros::error_panic;
 
 use axum::Router;
+use futures::executor::block_on;
 use tokio::net::TcpListener;
 use tracing::{info, warn};
 
@@ -68,11 +68,15 @@ impl ModuleTree {
         };
 
         for module in &self.modules {
-            let _ = scheduler.insert_list(module.get_cron_tasks());
+            let _ = scheduler.insert_list(module.get_cron_tasks()).await;
             app = app.nest(module.get_mount_point(), module.get_server_router());
         }
 
-        scheduler.start().unwrap();
+        let _ = thread::spawn(move || {
+            let fut = scheduler.start();
+            block_on(fut).unwrap()
+        })
+        .join();
 
         axum::serve(listener, app).await.unwrap_or_else(|e| {
             error_panic!("failed to start axum: {}", e.to_string());
