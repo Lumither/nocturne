@@ -1,7 +1,6 @@
 #[allow(dead_code)]
 mod constants;
 
-#[allow(dead_code)]
 mod scheduler;
 
 mod init;

@@ -44,15 +44,21 @@ impl Module for Blog {
         MOUNT_POINT
     }
 
-    fn get_cron_tasks(&self) -> Vec<Box<dyn CronTask>> {
+    fn get_cron_tasks(&self) -> Vec<(&str, Box<dyn CronTask>)> {
         let db_handler = self.db_handler.clone();
         vec![
-            AsyncBasic::new(check_update::task(db_handler.clone()), "* * * * * *")
-                .unwrap()
-                .to_task(),
-            BasicTask::new(|| println!("test lol"), "* * * * * *")
-                .unwrap()
-                .to_task(),
+            (
+                "Blog Check Update",
+                AsyncBasic::new(check_update::task(db_handler.clone()), "* * * * * *")
+                    .unwrap()
+                    .to_task(),
+            ),
+            (
+                "Sync test task",
+                BasicTask::new(|| println!("test lol"), "* * * * * *")
+                    .unwrap()
+                    .to_task(),
+            ),
         ]
     }
 }

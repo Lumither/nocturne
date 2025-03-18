@@ -1,6 +1,4 @@
-pub mod blog;
-
-use std::{env, num::ParseIntError, thread};
+use std::{env, num::ParseIntError};
 
 use crate::{
     constants::config::server::{default_value, var_name},
@@ -9,9 +7,10 @@ use crate::{
 use macros::error_panic;
 
 use axum::Router;
-use futures::executor::block_on;
 use tokio::net::TcpListener;
 use tracing::{info, warn};
+
+pub mod blog;
 
 // todo: merge `get_server_router` & `get_mount_point`, make Option
 pub trait Module {
@@ -19,7 +18,7 @@ pub trait Module {
 
     fn get_mount_point(&self) -> &'static str;
 
-    fn get_cron_tasks(&self) -> Vec<Box<dyn CronTask>>;
+    fn get_cron_tasks(&self) -> Vec<(&str, Box<dyn CronTask>)>;
 }
 
 pub struct ModuleTree {
@@ -37,7 +36,7 @@ impl ModuleTree {
     }
 
     pub async fn blocking_serve(&self) {
-        let scheduler = Scheduler::new();
+        let mut scheduler = Scheduler::new();
         let mut app = Router::new();
 
         let port: u32 = match env::var(var_name::PORT) {
@@ -54,7 +53,7 @@ impl ModuleTree {
 
         let listener = match TcpListener::bind(format!("{}:{}", default_value::HOST, port)).await {
             Ok(listener) => {
-                info!("server started on {}:{}", default_value::HOST, port);
+                info!("server starting on {}:{}", default_value::HOST, port);
                 listener
             }
             Err(e) => {
@@ -68,15 +67,13 @@ impl ModuleTree {
         };
 
         for module in &self.modules {
-            let _ = scheduler.insert_list(module.get_cron_tasks()).await;
+            let _ = scheduler.insert_list(module.get_cron_tasks());
             app = app.nest(module.get_mount_point(), module.get_server_router());
         }
 
-        let _ = thread::spawn(move || {
-            let fut = scheduler.start();
-            block_on(fut).unwrap()
-        })
-        .join();
+        tokio::spawn(async move {
+            scheduler.start().await;
+        });
 
         axum::serve(listener, app).await.unwrap_or_else(|e| {
             error_panic!("failed to start axum: {}", e.to_string());

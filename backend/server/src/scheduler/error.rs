@@ -7,6 +7,7 @@ use std::{
 use crate::scheduler::error::SchedulerError::MutexPoison;
 
 // todo: refactor with thiserror
+#[allow(dead_code)]
 pub enum SchedulerError {
     IdNotFound,
     IdAlreadyRunning,

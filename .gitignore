@@ -8,3 +8,6 @@
 
 # exclude post repo
 /blog_posts_git
+
+# rustc ICE dump
+rustc-ice-*.txt
