@@ -1,17 +1,19 @@
+use std::error::Error;
+
 use crate::utils::yaml::yaml_to_serde;
+
 use regex::Regex;
 use serde_json::Value;
-use std::error::Error;
 use yaml_rust2::YamlLoader;
 
-pub fn split_md_front_matter(raw_file: String) -> (String, String) {
+pub fn split_md_front_matter(raw_file: &str) -> (String, String) {
     let re = Regex::new(r"(?s)^(---\n.*?\n---\n)(.*)").unwrap();
-    if let Some(captures) = re.captures(raw_file.as_str()) {
+    if let Some(captures) = re.captures(raw_file) {
         let front_matter = captures.get(1).map_or("", |m| m.as_str()).to_string();
         let main_content = captures.get(2).map_or("", |m| m.as_str()).to_string();
         (front_matter, main_content)
     } else {
-        (String::new(), raw_file)
+        (String::new(), raw_file.to_string())
     }
 }
 
@@ -43,8 +45,7 @@ tags: [ "test1", "test2" ]
 
 test body
 
-"##
-            .to_string(),
+"##,
         );
         assert_eq!(
             front_matter,
@@ -64,7 +65,7 @@ tags: [ "test1", "test2" ]
 
     #[test]
     fn test_front_matter_parser() {
-        dbg!(parse_front_matter(
+        parse_front_matter(
             r##"---
 title: test_title
 date: 0000-00-00+0000
@@ -75,7 +76,7 @@ summary: summary
 tags: [ "test1", "test2" ]
 ---
 "##,
-        ))
+        )
         .expect("Failed to parse front matter");
     }
 }
