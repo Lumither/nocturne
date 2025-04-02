@@ -3,7 +3,7 @@ use std::{sync::Arc, time::Duration};
 use crate::scheduler::{error::SchedulerError, tasks::CronTask};
 
 use chrono::{DateTime, Utc};
-use tokio::time::{sleep, Sleep};
+use tokio::time::{Sleep, sleep};
 
 pub fn duration_from_now(future: DateTime<Utc>) -> Duration {
     future

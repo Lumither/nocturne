@@ -1,3 +1,5 @@
+// todo: rebuild with static OnceCell
+
 // Database related
 pub mod database {
     pub mod var_name {

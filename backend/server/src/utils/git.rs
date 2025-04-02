@@ -3,11 +3,10 @@
 /// https://github.com/rust-lang/git2-rs/commit/f3b87baed1e33d6c2d94fe1fa6aa6503a071d837
 ///
 use git2::{
-    build, AnnotatedCommit, AutotagOption, Delta, FetchOptions, Reference, Remote, Repository,
+    AnnotatedCommit, AutotagOption, Delta, FetchOptions, Reference, Remote, Repository, build,
 };
 use std::path::PathBuf;
 use tracing::{error, warn};
-
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct FileDelta {
@@ -40,7 +39,6 @@ fn fast_forward(
         None => String::from_utf8_lossy(lb.name_bytes()).to_string(),
     };
     let msg = format!("fast-forward({}) -> {}", name, rc.id());
-    // println!("{}", msg);
     lb.set_target(rc.id(), &msg)?;
     repo.set_head(&name)?;
     repo.checkout_head(Some(build::CheckoutBuilder::default().force()))?;

@@ -2,7 +2,7 @@ use std::{env, num::ParseIntError};
 
 use crate::{
     constants::config::server::{default_value, var_name},
-    scheduler::{tasks::CronTask, Scheduler},
+    scheduler::{Scheduler, tasks::CronTask},
 };
 use macros::error_panic;
 

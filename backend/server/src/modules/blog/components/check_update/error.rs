@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum PostIdxError {
+pub enum Error {
     #[error("missing essential field `{}` for file `{}`", field, filename)]
     MissingField { field: String, filename: String },
 
@@ -46,4 +46,7 @@ pub enum PostIdxError {
         id: String,
         msg: String,
     },
+
+    #[error("git error")]
+    Git2(#[from] git2::Error),
 }

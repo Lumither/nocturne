@@ -20,8 +20,6 @@ pub struct Scheduler {
 impl Scheduler {
     /// Start all tasks in the scheduler
     pub async fn start(&self) {
-        dbg!("entering");
-
         let fut = self
             .task_pool
             .clone()

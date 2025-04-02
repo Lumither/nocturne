@@ -1,6 +1,8 @@
 mod api;
 mod components;
 
+use crate::modules::blog::components::check_update;
+use crate::scheduler::tasks::async_basic::AsyncBasic;
 use crate::{
     modules::{
         blog::{
@@ -16,9 +18,6 @@ use crate::{
     scheduler::tasks::CronTask,
 };
 
-use crate::modules::blog::components::check_update;
-use crate::scheduler::tasks::async_basic::AsyncBasic;
-use crate::scheduler::tasks::basic::BasicTask;
 use axum::{routing::get, Router};
 use sqlx::PgPool;
 
@@ -46,19 +45,11 @@ impl Module for Blog {
 
     fn get_cron_tasks(&self) -> Vec<(&str, Box<dyn CronTask>)> {
         let db_handler = self.db_handler.clone();
-        vec![
-            (
-                "Blog Check Update",
-                AsyncBasic::new(check_update::task(db_handler.clone()), "* * * * * *")
-                    .unwrap()
-                    .to_task(),
-            ),
-            (
-                "Sync test task",
-                BasicTask::new(|| println!("test lol"), "* * * * * *")
-                    .unwrap()
-                    .to_task(),
-            ),
-        ]
+        vec![(
+            "Blog Check Update",
+            AsyncBasic::new(check_update::task(db_handler.clone()), "*/5 * * * * *")
+                .unwrap()
+                .to_task(),
+        )]
     }
 }

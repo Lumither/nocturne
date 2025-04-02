@@ -6,6 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use crate::modules::blog::components::check_update::pull::{analyze_deltas, fetch_deltas};
 use crate::modules::blog::components::check_update::{
     // index::drop_index,
     // utils::{expand_path, index_files, search_md},
@@ -13,14 +14,18 @@ use crate::modules::blog::components::check_update::{
 };
 use crate::scheduler::task_func::AsyncTaskFunc;
 use sqlx::PgPool;
-use tracing::{info, warn, Level};
+use tracing::{info, trace, warn, Level};
 
 // mod error;
 // mod index;
+mod changes;
+mod error;
+mod pull;
 mod utils;
 
 #[derive(Debug)]
 struct Args {
+    db_connection: PgPool,
     git_work_dir: PathBuf,
     git_url: String,
     git_remote_name: String,
@@ -45,7 +50,6 @@ pub fn task(db_connection: PgPool) -> impl AsyncTaskFunc {
     };
 
     // clone & check update
-
     let git_url = match env::var(var_name::BLOG_GIT_URL) {
         Ok(url) => url,
         Err(e) => {
@@ -63,16 +67,33 @@ pub fn task(db_connection: PgPool) -> impl AsyncTaskFunc {
         .unwrap_or(default_value::BLOG_GIT_REMOTE_BRANCH.to_string());
 
     let arc_args = Arc::new(Args {
+        db_connection,
         git_work_dir,
         git_url,
         git_remote_name,
         git_remote_branch,
     });
 
-    move || Box::pin(test(arc_args.clone()))
+    move || Box::pin(workflow(arc_args.clone()))
 }
 
-async fn test(args: Arc<Args>) {
-    info!("test");
-    dbg!(&args);
+async fn workflow(args: Arc<Args>) {
+    let deltas = match fetch_deltas(
+        &args.git_url,
+        &args.git_remote_name,
+        &args.git_remote_branch,
+        &args.git_work_dir,
+    )
+    .await
+    {
+        Ok(updates) => updates,
+        Err(_) => return,
+    };
+
+    if deltas.is_empty() {
+        trace!("blog git already up-to-date");
+        return;
+    }
+
+    let updates = analyze_deltas(deltas, &args.git_work_dir).await;
 }
