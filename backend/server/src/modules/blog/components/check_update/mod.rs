@@ -1,20 +1,18 @@
-use crate::constants::config::general::{default_value, var_name};
-use macros::panic_with_log;
-use std::sync::Arc;
 use std::{
     env,
     path::{Path, PathBuf},
+    sync::Arc,
 };
 
-use crate::modules::blog::components::check_update::pull::{analyze_deltas, fetch_deltas};
-use crate::modules::blog::components::check_update::{
-    // index::drop_index,
-    // utils::{expand_path, index_files, search_md},
-    utils::expand_path,
+use crate::{
+    constants::config::general::{default_value, var_name},
+    modules::blog::components::check_update::{pull::fetch_deltas, utils::expand_path},
+    scheduler::task_func::AsyncTaskFunc,
 };
-use crate::scheduler::task_func::AsyncTaskFunc;
+use macros::panic_with_log;
+
 use sqlx::PgPool;
-use tracing::{info, trace, warn, Level};
+use tracing::{trace, warn, Level};
 
 // mod error;
 // mod index;
@@ -95,5 +93,5 @@ async fn workflow(args: Arc<Args>) {
         return;
     }
 
-    let updates = analyze_deltas(deltas, &args.git_work_dir).await;
+    // todo: load delta to database
 }

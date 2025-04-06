@@ -1,12 +1,13 @@
-/// git merge
+/// git operations
 /// based on https://github.com/rust-lang/git2-rs/blob/master/examples/pull.rs
 /// https://github.com/rust-lang/git2-rs/commit/f3b87baed1e33d6c2d94fe1fa6aa6503a071d837
 ///
 use git2::{
-    AnnotatedCommit, AutotagOption, Delta, FetchOptions, Reference, Remote, Repository, build,
+    build, AnnotatedCommit, AutotagOption, Delta, FetchOptions, Reference, Remote, Repository,
 };
 use std::path::PathBuf;
 use tracing::{error, warn};
+
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct FileDelta {
@@ -15,7 +16,7 @@ pub struct FileDelta {
     pub status: Delta,
 }
 
-fn do_fetch<'a>(
+pub fn do_fetch<'a>(
     repo: &'a Repository,
     refs: &[&str],
     remote: &'a mut Remote,
@@ -81,11 +82,11 @@ fn normal_merge(
     Ok(())
 }
 
-fn do_merge<'a>(
+pub fn do_merge<'a>(
     repo: &'a Repository,
     remote_branch: &str,
     fetch_commit: AnnotatedCommit<'a>,
-) -> Result<Vec<FileDelta>, git2::Error> {
+) -> Result<(), git2::Error> {
     let analysis = repo.merge_analysis(&[&fetch_commit])?;
     let head_commit = repo.reference_to_annotated_commit(&repo.head()?)?;
 
@@ -114,10 +115,11 @@ fn do_merge<'a>(
     } else if analysis.0.is_normal() {
         normal_merge(repo, &head_commit, &fetch_commit)?;
     }
-    calculate_diff(repo, &head_commit, &fetch_commit)
+
+    Ok(())
 }
 
-fn calculate_diff(
+pub fn calculate_diff(
     repo: &Repository,
     local: &AnnotatedCommit,
     remote: &AnnotatedCommit,
@@ -147,6 +149,7 @@ fn calculate_diff(
     Ok(updated_files.into_iter().collect())
 }
 
+#[allow(dead_code)]
 pub fn sync(
     remote_name: &str,
     remote_branch: &str,
@@ -154,5 +157,11 @@ pub fn sync(
 ) -> Result<Vec<FileDelta>, git2::Error> {
     let mut remote = repo.find_remote(remote_name)?;
     let fetch_commit = do_fetch(repo, &[remote_branch], &mut remote)?;
-    do_merge(repo, remote_branch, fetch_commit)
+    let delta = calculate_diff(
+        repo,
+        &repo.reference_to_annotated_commit(&repo.head()?)?,
+        &fetch_commit,
+    );
+    do_merge(repo, remote_branch, fetch_commit)?;
+    delta
 }

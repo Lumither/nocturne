@@ -1,20 +1,26 @@
-use crate::modules::blog::components::check_update::changes::{Change, DeltaIdx};
-use crate::modules::blog::components::check_update::error::Error;
-use crate::utils::git;
-use crate::utils::git::FileDelta;
-use git2::{Delta, Repository};
-use markdown::MdFile;
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
+
+use crate::{
+    modules::blog::components::check_update::{
+        changes::{Change, Create, Delete, Update},
+        error::Error,
+    },
+    utils::{git, git::FileDelta},
+};
+use markdown::MdFile;
+
+use crate::modules::blog::components::check_update::changes::CreateDelete2UpdateSlot;
+use git2::{Delta, Repository};
 use tracing::error;
 use uuid::Uuid;
 
 pub async fn fetch_deltas(
     git_url: &str,
     git_remote_name: &str,
-    git_branch: &str,
+    git_remote_branch: &str,
     git_work_dir: &PathBuf,
-) -> Result<Vec<FileDelta>, Error> {
+) -> Result<Vec<Change>, Error> {
     let repo = match Repository::open(git_work_dir) {
         Ok(repo) => repo,
         Err(_) => match Repository::clone(git_url, git_work_dir) {
@@ -26,114 +32,87 @@ pub async fn fetch_deltas(
         },
     };
 
-    let updates = match git::sync(git_remote_name, git_branch, &repo) {
-        Ok(updates) => updates,
-        Err(e) => {
-            error!(
-                "failed to sync blog content git({}) updates: {}",
-                &git_url, e
-            );
-            return Err(e.into());
-        }
-    };
+    let mut remote = repo.find_remote(git_remote_name)?;
+    let fetched_commit = git::do_fetch(&repo, &[git_remote_branch], &mut remote)?;
+    let commit_deltas = git::calculate_diff(
+        &repo,
+        &repo.reference_to_annotated_commit(&repo.head()?)?,
+        &fetched_commit,
+    )?;
 
-    Ok(updates)
-}
-
-pub async fn analyze_deltas(file_deltas: Vec<FileDelta>, git_work_dir: &Path) -> Vec<Change> {
-    dbg!(&file_deltas);
+    // dbg!(&commit_deltas);
     let mut changes: Vec<Change> = vec![];
-    let mut merge_deltas: Vec<FileDelta> = vec![];
+    let mut non_delete_deltas: Vec<FileDelta> = vec![];
 
-    for delta in file_deltas.into_iter() {
-        if delta.status == Delta::Modified {
+    // process deleted deltas before merging commit to prevent "file not found" os error
+    for delta in commit_deltas.into_iter() {
+        if delta.status == Delta::Deleted {
             let file_path = &git_work_dir.join(
                 delta
                     .new_path
                     .expect("cannot parse modified post `new_path`"),
             );
-            let post = match MdFile::from_file(file_path) {
-                Ok(post) => post,
-                Err(e) => {
-                    error!("md file parsing error: {}", e);
-                    continue;
-                }
-            };
-
-            let id = match extract_post_id(&post) {
-                Some(id) => id,
-                None => {
-                    // todo: add to unresolved error list
-                    error!(
-                        "failed to parse uuid on post {}",
-                        file_path.to_string_lossy()
-                    );
-                    continue;
-                }
-            };
-
-            changes.push(Change::UPDATE {
-                uuid: id,
-                content: post.content,
-            })
+            if let Some(id) = extract_post_id(&MdFile::from_file(file_path)?) {
+                changes.push(Change::Delete(Delete {
+                    uuid: id,
+                    path: file_path.clone(),
+                }))
+            } else {
+                error!("failed to parse uuid for file {}", file_path.display());
+                // todo: add to unresolved error list
+            }
         } else {
-            merge_deltas.push(delta)
-        };
+            non_delete_deltas.push(delta);
+        }
     }
 
-    // merge some addition and remove deltas to rename/move changes
-    let delta_idx = {
-        let mut delta_idx: HashMap<Uuid, Vec<DeltaIdx>> = HashMap::new();
-        for file_delta in merge_deltas.into_iter() {
-            let file_path = &git_work_dir.join(
-                file_delta
-                    .new_path
-                    .expect("cannot parse modified post `new_path`"),
-            );
-            match file_delta.status {
-                // todo: split impl
-                Delta::Added | Delta::Deleted => {
-                    let file_path_str = file_path.to_string_lossy();
+    git::do_merge(&repo, git_remote_branch, fetched_commit)?;
 
-                    let post = match MdFile::from_file(file_path) {
-                        Ok(post) => post,
-                        Err(e) => {
-                            error!("md file parsing error ({}): {}", file_path_str, e);
-                            continue;
-                        }
-                    };
-
-                    let id = match extract_post_id(&post) {
-                        Some(id) => id,
-                        None => {
-                            // todo: add to unresolved error list
-                            error!("failed to parse uuid on post {}", file_path_str);
-                            continue;
-                        }
-                    };
-
-                    let file_delta_idx = DeltaIdx {
-                        delta_type: file_delta.status,
-                        content: post.content,
-                    };
-                    delta_idx
-                        .entry(id)
-                        // todo: change to shallow copy
-                        .and_modify(|v| v.push(file_delta_idx.clone()))
-                        .or_insert(vec![file_delta_idx]);
+    // process adds and modifies deltas
+    for delta in non_delete_deltas.into_iter() {
+        let file_path = &git_work_dir.join(
+            delta
+                .new_path
+                .expect("cannot parse modified post `new_path`"),
+        );
+        match delta.status {
+            Delta::Added => {
+                let md_file = MdFile::from_file(file_path)?;
+                if let Some(id) = extract_post_id(&md_file) {
+                    changes.push(Change::Create(Create {
+                        uuid: id,
+                        path: file_path.clone(),
+                        payload: md_file,
+                    }))
+                } else {
+                    error!("failed to parse uuid for file {}", file_path.display());
+                    // todo: add to unresolved error list
                 }
-                _ => {
-                    error!("unsupported delta on file {}", file_path.to_string_lossy());
-                    continue;
+            }
+            Delta::Modified => {
+                let md_file = MdFile::from_file(file_path)?;
+                if let Some(id) = extract_post_id(&md_file) {
+                    changes.push(Change::Update(Update {
+                        uuid: id,
+                        payload: md_file,
+                    }))
+                } else {
+                    error!("failed to parse uuid for file {}", file_path.display());
+                    // todo: add to unresolved error list
                 }
-            };
+            }
+            Delta::Deleted => continue,
+            _ => {
+                error!("unsupported delta type on file {}", file_path.display());
+                continue;
+            }
         }
-        delta_idx
-    };
+    }
 
-    dbg!(&delta_idx);
+    // merge adds and deletes deltas to moves
+    let changes = dbg!(merge_changes(changes));
 
-    changes
+    Ok(changes)
 }
 
 fn extract_post_id(post: &MdFile) -> Option<Uuid> {
@@ -144,4 +123,31 @@ fn extract_post_id(post: &MdFile) -> Option<Uuid> {
         },
         None => None,
     }
+}
+
+fn merge_changes(changes: Vec<Change>) -> Vec<Change> {
+    let mut slots: HashMap<Uuid, CreateDelete2UpdateSlot> = HashMap::new();
+    let mut merged: Vec<Change> = Vec::new();
+
+    for change in changes {
+        match change {
+            Change::Create(create) => {
+                let id = create.uuid;
+                slots.entry(id).or_default().create = Some(create);
+            }
+            Change::Delete(delete) => {
+                let id = delete.uuid;
+                slots.entry(id).or_default().delete = Some(delete);
+            }
+            _ => merged.push(change),
+        }
+    }
+
+    for slot in slots.values() {
+        if let Some(change) = slot.to_change() {
+            merged.push(change);
+        }
+    }
+
+    merged
 }

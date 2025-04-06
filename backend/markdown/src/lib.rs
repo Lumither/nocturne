@@ -1,4 +1,4 @@
-mod error;
+pub mod error;
 mod utils;
 
 use std::{fs, path::Path, str::FromStr};
@@ -8,12 +8,12 @@ use crate::{
     utils::front_matter::{parse_front_matter, split_md_front_matter},
 };
 
-use base64::{Engine, engine::general_purpose};
+use base64::{engine::general_purpose, Engine};
 use serde::Serialize;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Serialize, Clone)]
 pub struct MdFile {
     pub meta: Value,
     pub content: String,

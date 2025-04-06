@@ -1,7 +1,13 @@
+use markdown::error::Error as MarkdownError;
+
 use thiserror::Error;
 
+#[allow(dead_code)]
 #[derive(Error, Debug)]
 pub enum Error {
+    #[error("markdown file error")]
+    MdFile(#[from] MarkdownError),
+
     #[error("missing essential field `{}` for file `{}`", field, filename)]
     MissingField { field: String, filename: String },
 
