@@ -1,16 +1,14 @@
-use std::collections::HashMap;
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 use crate::{
     modules::blog::components::check_update::{
-        changes::{Change, Create, Delete, Update},
+        changes::{Change, Create, CreateDelete2UpdateSlot, Delete, Update},
         error::Error,
     },
     utils::{git, git::FileDelta},
 };
 use markdown::MdFile;
 
-use crate::modules::blog::components::check_update::changes::CreateDelete2UpdateSlot;
 use git2::{Delta, Repository};
 use tracing::error;
 use uuid::Uuid;

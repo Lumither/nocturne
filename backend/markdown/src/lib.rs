@@ -8,7 +8,7 @@ use crate::{
     utils::front_matter::{parse_front_matter, split_md_front_matter},
 };
 
-use base64::{engine::general_purpose, Engine};
+use base64::{Engine, engine::general_purpose};
 use serde::Serialize;
 use serde_json::Value;
 use sha2::{Digest, Sha256};

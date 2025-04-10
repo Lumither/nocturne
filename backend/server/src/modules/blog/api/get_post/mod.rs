@@ -7,28 +7,29 @@ use axum::{
 };
 use serde_json::json;
 use sqlx::PgPool;
+use uuid::Uuid;
 
-const GET_POST_BY_I64_ID: &str = include_str!("get_post_by_i64_id.sql");
+const GET_POST_BY_UUID: &str = include_str!("get_post_by_uuid.sql");
 const GET_POST_BY_STR_ID: &str = include_str!("get_post_by_str_id.sql");
 
 pub async fn handler(
     State(db_connection): State<PgPool>,
     Path(identifier): Path<String>,
 ) -> impl IntoResponse {
-    if let Ok(id) = identifier.parse::<i64>() {
-        select_post_with_i64_id(&db_connection, id).await
+    if let Ok(id) = identifier.parse::<Uuid>() {
+        select_post_by_uuid(&db_connection, id).await
     } else {
-        select_post_with_str_id(&db_connection, &identifier).await
+        select_post_by_str_id(&db_connection, &identifier).await
     };
     Json::from(json!({"res": "ok"})).into_response()
 }
 
-async fn select_post_with_i64_id(db: &PgPool, id: i64) {
+async fn select_post_by_uuid(db: &PgPool, id: Uuid) {
     dev_consume!(db, id);
     todo!()
 }
 
-async fn select_post_with_str_id(db: &PgPool, id: &str) {
+async fn select_post_by_str_id(db: &PgPool, id: &str) {
     dev_consume!(db, id);
     todo!()
 }

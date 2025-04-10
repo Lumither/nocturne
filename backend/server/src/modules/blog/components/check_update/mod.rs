@@ -11,11 +11,14 @@ use crate::{
 };
 use macros::panic_with_log;
 
+use crate::modules::blog::components::check_update::apply::apply_deltas;
 use sqlx::PgPool;
-use tracing::{trace, warn, Level};
+use tracing::log::error;
+use tracing::{Level, trace, warn};
 
 // mod error;
 // mod index;
+mod apply;
 mod changes;
 mod error;
 mod pull;
@@ -85,7 +88,10 @@ async fn workflow(args: Arc<Args>) {
     .await
     {
         Ok(updates) => updates,
-        Err(_) => return,
+        Err(e) => {
+            error!("delta parsing error: {}", e);
+            return;
+        }
     };
 
     if deltas.is_empty() {
@@ -93,5 +99,5 @@ async fn workflow(args: Arc<Args>) {
         return;
     }
 
-    // todo: load delta to database
+    apply_deltas(&args.db_connection, deltas).await;
 }
