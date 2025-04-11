@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, fs::remove_dir_all, path::PathBuf};
 
 use crate::{
     modules::blog::components::check_update::{
@@ -10,7 +10,7 @@ use crate::{
 use markdown::MdFile;
 
 use git2::{Delta, Repository};
-use tracing::error;
+use tracing::{error, warn};
 use uuid::Uuid;
 
 pub async fn fetch_deltas(
@@ -30,7 +30,27 @@ pub async fn fetch_deltas(
         },
     };
 
-    let mut remote = repo.find_remote(git_remote_name)?;
+    let mut remote = match repo.find_remote(git_remote_name) {
+        Ok(remote) => remote,
+        Err(e) => {
+            remove_dir_all(git_work_dir).unwrap();
+            warn!(
+                "cannot find git remote ({}), reinitializing: {}",
+                git_remote_name, e
+            );
+            return Err(e.into());
+        }
+    };
+    if remote.url().is_some_and(|url| url != git_url) {
+        remove_dir_all(git_work_dir).unwrap();
+        warn!(
+            "git remote url mismatch (expected: {}, actual: {}), reinitializing",
+            git_url,
+            remote.url().unwrap()
+        );
+        return Err(Error::GitUrlMismatch);
+    }
+
     let fetched_commit = git::do_fetch(&repo, &[git_remote_branch], &mut remote)?;
     let commit_deltas = git::calculate_diff(
         &repo,
@@ -44,6 +64,8 @@ pub async fn fetch_deltas(
 
     // process deleted deltas before merging commit to prevent "file not found" os error
     for delta in commit_deltas.into_iter() {
+        // todo: limit scanning scope to post only OR extract merging logic to external component
+
         if delta.status == Delta::Deleted {
             let file_path = &git_work_dir.join(
                 delta
@@ -115,10 +137,7 @@ pub async fn fetch_deltas(
 
 fn extract_post_id(post: &MdFile) -> Option<Uuid> {
     match post.meta["uuid"].as_str() {
-        Some(id) => match Uuid::parse_str(id) {
-            Ok(id) => Some(id),
-            Err(_) => None,
-        },
+        Some(id) => Uuid::parse_str(id).ok(),
         None => None,
     }
 }
