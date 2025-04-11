@@ -2,57 +2,17 @@ use markdown::error::Error as MarkdownError;
 
 use thiserror::Error;
 
-#[allow(dead_code)]
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("markdown file error")]
     MdFile(#[from] MarkdownError),
 
-    #[error("missing essential field `{}` for file `{}`", field, filename)]
-    MissingField { field: String, filename: String },
-
-    #[error(
-        "invalid field `{}` for file `{}`, <{}>: {}",
-        field_name,
-        filename,
-        err_field,
-        msg
-    )]
-    InvalidField {
-        field_name: String,
-        err_field: String,
-        filename: String,
-        msg: String,
-    },
-
-    #[error(
-        "database error on writing `{}` to table `{}`: <{}>: {}",
-        data_desc,
-        db_table,
-        id,
-        msg
-    )]
-    DBWriteFailure {
-        data_desc: String,
-        db_table: String,
-        id: String,
-        msg: String,
-    },
-
-    #[error(
-        "Database error on Reading `{}` from table `{}`: <{}>: {}",
-        data_desc,
-        db_table,
-        id,
-        msg
-    )]
-    DBReadFailure {
-        data_desc: String,
-        db_table: String,
-        id: String,
-        msg: String,
-    },
+    #[error("db error")]
+    Db(#[from] sqlx::Error),
 
     #[error("git error")]
     Git2(#[from] git2::Error),
+
+    #[error("git remote url mismatch")]
+    GitUrlMismatch,
 }
