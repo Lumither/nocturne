@@ -1,0 +1,4 @@
+rich~=13.9.4
+prompt_toolkit~=3.0.50
+pypinyin~=0.53.0
+python-frontmatter~=1.1.0
