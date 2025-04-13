@@ -114,6 +114,7 @@ pub async fn fetch_deltas(
                 if let Some(id) = extract_post_id(&md_file) {
                     changes.push(Change::Update(Update {
                         uuid: id,
+                        path: file_path.clone(),
                         payload: md_file,
                     }))
                 } else {

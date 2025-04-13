@@ -44,15 +44,43 @@ async fn handle_delete(db: &PgPool, del: Delete) {
 }
 
 async fn handle_move(db: &PgPool, mv: Move) {
-    let identifier = parse_post_identifier(&mv.to).unwrap();
-
-    dev_consume!(db, mv, identifier);
-    todo!()
+    handle_delete(
+        db,
+        Delete {
+            uuid: mv.uuid,
+            path: mv.from,
+        },
+    )
+    .await;
+    handle_create(
+        db,
+        Create {
+            uuid: mv.uuid,
+            path: mv.to,
+            payload: mv.payload,
+        },
+    )
+    .await;
 }
 
 async fn handle_update(db: &PgPool, update: Update) {
-    dev_consume!(db, update);
-    todo!()
+    handle_delete(
+        db,
+        Delete {
+            uuid: update.uuid,
+            path: update.path.clone(),
+        },
+    )
+    .await;
+    handle_create(
+        db,
+        Create {
+            uuid: update.uuid,
+            path: update.path,
+            payload: update.payload,
+        },
+    )
+    .await;
 }
 
 async fn handle_create(db: &PgPool, create: Create) {
@@ -98,7 +126,7 @@ async fn handle_create(db: &PgPool, create: Create) {
         .map(|t| t.as_str().unwrap())
         .unwrap_or("Untitled");
     let post_subtitle = meta
-        .get("sub_title")
+        .get("subtitle")
         .map(|t| t.as_str().unwrap())
         .unwrap_or("");
     let post_date_created = if let Some(Some(date)) = meta

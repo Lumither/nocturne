@@ -33,6 +33,7 @@ pub struct Move {
 #[derive(Debug, Clone)]
 pub struct Update {
     pub uuid: Uuid,
+    pub path: PathBuf,
     pub payload: MdFile,
 }
 
