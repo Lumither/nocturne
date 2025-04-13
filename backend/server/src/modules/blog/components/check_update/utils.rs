@@ -1,10 +1,11 @@
+use std::path::Path;
+
 use crate::constants::{
     config::general::{default_value, var_name},
-    time::DEFAULT_DATE_FORMAT,
+    time::DEFAULT_NAIVE_DATE_FORMAT,
 };
 
-// use crate::modules::blog::components::check_update::index::index_file;
-use chrono::{DateTime, FixedOffset, ParseResult};
+use chrono::NaiveDate;
 use dirs::home_dir;
 use tracing::warn;
 
@@ -30,6 +31,28 @@ pub fn expand_path(path: String) -> String {
     }
 }
 
-pub fn parse_date(date_str: &str) -> ParseResult<DateTime<FixedOffset>> {
-    DateTime::parse_from_str(format!("{}T120000", date_str).as_str(), DEFAULT_DATE_FORMAT)
+pub fn parse_post_identifier(path: &Path) -> Option<String> {
+    if let Some(comp) = path.components().nth_back(1) {
+        comp.as_os_str().to_str().map(|s| s.to_string())
+    } else {
+        None
+    }
+}
+
+pub fn parse_naive_date_str(date_str: &str) -> Option<NaiveDate> {
+    NaiveDate::parse_from_str(date_str, DEFAULT_NAIVE_DATE_FORMAT).ok()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::modules::blog::components::check_update::utils::parse_naive_date_str;
+    use chrono::NaiveDate;
+
+    #[test]
+    fn test_parse_naive_date() {
+        assert_eq!(
+            Some(NaiveDate::from_ymd(2015, 1, 1)),
+            parse_naive_date_str("2015-1-01")
+        );
+    }
 }

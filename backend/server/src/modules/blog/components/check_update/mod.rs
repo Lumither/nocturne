@@ -6,15 +6,15 @@ use std::{
 
 use crate::{
     constants::config::general::{default_value, var_name},
-    modules::blog::components::check_update::{pull::fetch_deltas, utils::expand_path},
+    modules::blog::components::check_update::{
+        apply::apply_deltas, pull::fetch_deltas, utils::expand_path,
+    },
     scheduler::task_func::AsyncTaskFunc,
 };
 use macros::panic_with_log;
 
-use crate::modules::blog::components::check_update::apply::apply_deltas;
 use sqlx::PgPool;
-use tracing::log::error;
-use tracing::{Level, trace, warn};
+use tracing::{log::error, trace, warn, Level};
 
 // mod error;
 // mod index;
