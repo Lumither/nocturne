@@ -7,10 +7,4 @@ content (blog posts etc.) repo.
 Powered by Next.js and Rust, built with passion and love
 
 > [!NOTE]
-> This system is not production ready, and contains bugs, (security risk potentially).
-> But have fun on it =)
-
-# Todos
-
-- [ ] the todo list lol
-- [ ] and much more...
+> This is an unstable branch, checkout `release` for the (guaranteed) working version
