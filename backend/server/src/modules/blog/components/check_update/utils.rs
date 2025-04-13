@@ -51,7 +51,7 @@ mod tests {
     #[test]
     fn test_parse_naive_date() {
         assert_eq!(
-            Some(NaiveDate::from_ymd(2015, 1, 1)),
+            NaiveDate::from_ymd_opt(2015, 1, 1),
             parse_naive_date_str("2015-1-01")
         );
     }
