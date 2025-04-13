@@ -3,7 +3,6 @@ use crate::modules::blog::components::check_update::{
     error::Error,
     utils::{parse_naive_date_str, parse_post_identifier},
 };
-use macros::dev_consume;
 
 use futures::{
     future::{join_all, BoxFuture},
