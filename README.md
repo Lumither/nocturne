@@ -1,13 +1,11 @@
 # `Nocturne: personal website & CMS`
 
+> This is the last working version
+
 This is the code repo of my personal website, and [here](https://github.com/Lumither/blog-posts/) is the link of the
 content repo.
 
 Powered by Next.js and Rust, built with passion and love
-
-<p align="center">
-  <img src="https://avatars.githubusercontent.com/u/46409277?v=4" alt="GitHub Avatar"/>
-</p>
 
 *will add more here in the future
 
