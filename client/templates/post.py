@@ -10,13 +10,14 @@ from utils.lang import eprint, wprint
 
 POST_TEMPLATE = '''
 ---
+uuid: {{ uuid }}
 title: {{ title }}
 subtitle: {{ subtitle }}
-published_date: {{ published_date }}
-last_updated: {{ last_update }}
+status: {{ status }}
+date: {{ date }}
+update: {{ update }}
 category: {{ category }}
 tags: {{ tags }}
-uuid: {{ uuid }}
 ---
 
 WIP
@@ -38,9 +39,9 @@ def get_subtitle():
     return input("subtitle > ")
 
 
-def get_published_date():
+def get_date():
     while True:
-        d = input("published_date (YYYY-MM-DD) > ")
+        d = input("date (YYYY-MM-DD) > ")
         if d == "":
             wprint("using today's date")
             return dt.today().strftime("%Y-%m-%d")
@@ -78,8 +79,8 @@ class BlogPost(Template):
         index_md = POST_TEMPLATE.format(
             title=get_title(),
             subtitle=get_subtitle(),
-            published_date=get_published_date(),
-            last_update=dt.today().strftime("%Y-%m-%d"),
+            date=get_date(),
+            update=dt.today().strftime("%Y-%m-%d"),
             tags=get_tags(),
             category=get_category(),
             uuid=uuid.uuid4()
