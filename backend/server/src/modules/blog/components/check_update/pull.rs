@@ -1,3 +1,4 @@
+use std::sync::LazyLock;
 use std::{collections::HashMap, fs::remove_dir_all, path::PathBuf};
 
 use crate::{
@@ -10,6 +11,7 @@ use crate::{
 use markdown::MdFile;
 
 use git2::{Delta, Repository};
+use regex::Regex;
 use tracing::{error, warn};
 use uuid::Uuid;
 
@@ -64,14 +66,17 @@ pub async fn fetch_deltas(
 
     // process deleted deltas before merging commit to prevent "file not found" os error
     for delta in commit_deltas.into_iter() {
-        // todo: limit scanning scope to post only OR extract merging logic to external component
+        let relative_file_path = delta
+            .new_path
+            .clone()
+            .expect("cannot parse modified post `new_path`");
+
+        if !should_delta_tracked(&relative_file_path) {
+            continue;
+        }
 
         if delta.status == Delta::Deleted {
-            let file_path = &git_work_dir.join(
-                delta
-                    .new_path
-                    .expect("cannot parse modified post `new_path`"),
-            );
+            let file_path = &git_work_dir.join(relative_file_path);
             if let Some(id) = extract_post_id(&MdFile::from_file(file_path)?) {
                 changes.push(Change::Delete(Delete {
                     uuid: id,
@@ -168,4 +173,11 @@ fn merge_changes(changes: Vec<Change>) -> Vec<Change> {
     }
 
     merged
+}
+
+static TRACKED_DELTA_RULE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"posts/\d{4}/[a-zA-Z0-9-]+/index\.md").unwrap());
+
+fn should_delta_tracked(path: &PathBuf) -> bool {
+    TRACKED_DELTA_RULE.is_match(path.to_str().unwrap())
 }
