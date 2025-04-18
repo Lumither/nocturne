@@ -5,10 +5,10 @@ use crate::modules::blog::components::check_update::{
 };
 
 use futures::{
-    future::{join_all, BoxFuture},
     FutureExt,
+    future::{BoxFuture, join_all},
 };
-use sqlx::{query, PgPool, Postgres, Row, Transaction};
+use sqlx::{PgPool, Postgres, Row, Transaction, query};
 use tracing::error;
 
 const DELETE_POST_BY_ID: &str = include_str!("sql/delete_post_by_id.sql");
@@ -16,7 +16,8 @@ const GET_TAG_ID: &str = include_str!("sql/get_tag_id.sql");
 const GET_CATEGORY_ID: &str = include_str!("sql/get_category_id.sql");
 const CREATE_RETURN_TAG_ID: &str = include_str!("sql/create_return_tag_id.sql");
 const CREATE_RETURN_CATEGORY_ID: &str = include_str!("sql/create_return_category_id.sql");
-const CREATE_POST: &str = include_str!("sql/create_post.sql");
+const CREATE_POST_GENERAL: &str = include_str!("sql/create_post_general.sql");
+const CREATE_POST_TAGS: &str = include_str!("sql/create_post_tags.sql");
 
 pub async fn apply_deltas(db_conn: &PgPool, changes: Vec<Change>) {
     let handlers = changes
@@ -47,7 +48,7 @@ async fn handle_move(db: &PgPool, mv: Move) {
         db,
         Delete {
             uuid: mv.uuid,
-            path: mv.from,
+            path: Some(mv.from),
         },
     )
     .await;
@@ -67,7 +68,7 @@ async fn handle_update(db: &PgPool, update: Update) {
         db,
         Delete {
             uuid: update.uuid,
-            path: update.path.clone(),
+            path: Some(update.path.clone()),
         },
     )
     .await;
@@ -143,8 +144,9 @@ async fn handle_create(db: &PgPool, create: Create) {
         .unwrap_or(None);
     let post_status = meta.get("status").map(|v| v.as_str()).unwrap_or(None);
     let post_content = create.payload.content;
+    let post_hash = create.payload.hash;
 
-    if let Err(e) = query(CREATE_POST)
+    if let Err(e) = query(CREATE_POST_GENERAL)
         .bind(post_id)
         .bind(post_identifier)
         .bind(post_title)
@@ -153,7 +155,17 @@ async fn handle_create(db: &PgPool, create: Create) {
         .bind(post_date_updated)
         .bind(post_status)
         .bind(post_content)
+        .bind(post_hash)
         .bind(category_id)
+        .execute(&mut *tx)
+        .await
+    {
+        error!("failed to insert post {}: {}", &identifier, e);
+        return;
+    }
+
+    if let Err(e) = query(CREATE_POST_TAGS)
+        .bind(post_id)
         .bind(tag_ids)
         .execute(&mut *tx)
         .await

@@ -14,8 +14,7 @@ CREATE TABLE categories
 
 CREATE TABLE post_status
 (
-    id   SERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE NOT NULL
+    name VARCHAR(20) PRIMARY KEY
 );
 
 INSERT INTO post_status (name)
@@ -27,14 +26,15 @@ VALUES ('draft'),
 CREATE TABLE posts
 (
     id           UUID PRIMARY KEY,
-    identifier   VARCHAR(100) UNIQUE                           NOT NULL,
-    title        VARCHAR(255)                                  NOT NULL,
-    subtitle     VARCHAR(255)                                  NOT NULL,
-    date_created DATE                                          NOT NULL,
+    identifier   VARCHAR(100) UNIQUE                       NOT NULL,
+    title        VARCHAR(255)                              NOT NULL,
+    subtitle     VARCHAR(255)                              NOT NULL,
+    date_created DATE                                      NOT NULL,
     date_updated DATE,
-    status       INTEGER REFERENCES post_status (id) DEFAULT 1 NOT NULL,
-    content      TEXT                                          NOT NULL,
-    category     INTEGER REFERENCES categories (id)            NOT NULL
+    status       VARCHAR(20) REFERENCES post_status (name) NOT NULL,
+    content      TEXT                                      NOT NULL,
+    hash         VARCHAR(44)                               NOT NULL,
+    category     INTEGER REFERENCES categories (id)        NOT NULL
 );
 
 CREATE TABLE post_tag

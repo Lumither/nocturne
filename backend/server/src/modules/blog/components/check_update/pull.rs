@@ -1,17 +1,19 @@
-use std::sync::LazyLock;
-use std::{collections::HashMap, fs::remove_dir_all, path::PathBuf};
+use std::{collections::HashMap, fs::remove_dir_all, path::Path, path::PathBuf};
 
 use crate::{
-    modules::blog::components::check_update::{
-        changes::{Change, Create, CreateDelete2UpdateSlot, Delete, Update},
-        error::Error,
+    modules::blog::components::{
+        check_update::{
+            changes::{Change, Create, CreateDelete2UpdateSlot, Delete, Update},
+            error::Error,
+            utils::extract_post_id,
+        },
+        static_rsc::BLOG_POST_PATH_PATTERN,
     },
     utils::{git, git::FileDelta},
 };
 use markdown::MdFile;
 
 use git2::{Delta, Repository};
-use regex::Regex;
 use tracing::{error, warn};
 use uuid::Uuid;
 
@@ -80,7 +82,7 @@ pub async fn fetch_deltas(
             if let Some(id) = extract_post_id(&MdFile::from_file(file_path)?) {
                 changes.push(Change::Delete(Delete {
                     uuid: id,
-                    path: file_path.clone(),
+                    path: Some(file_path.clone()),
                 }))
             } else {
                 error!("failed to parse uuid for file {}", file_path.display());
@@ -136,16 +138,9 @@ pub async fn fetch_deltas(
     }
 
     // merge adds and deletes deltas to moves
-    let changes = dbg!(merge_changes(changes));
+    let changes = merge_changes(changes);
 
     Ok(changes)
-}
-
-fn extract_post_id(post: &MdFile) -> Option<Uuid> {
-    match post.meta["uuid"].as_str() {
-        Some(id) => Uuid::parse_str(id).ok(),
-        None => None,
-    }
 }
 
 fn merge_changes(changes: Vec<Change>) -> Vec<Change> {
@@ -175,9 +170,6 @@ fn merge_changes(changes: Vec<Change>) -> Vec<Change> {
     merged
 }
 
-static TRACKED_DELTA_RULE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"posts/\d{4}/[a-zA-Z0-9-]+/index\.md").unwrap());
-
-fn should_delta_tracked(path: &PathBuf) -> bool {
-    TRACKED_DELTA_RULE.is_match(path.to_str().unwrap())
+fn should_delta_tracked(path: &Path) -> bool {
+    BLOG_POST_PATH_PATTERN.is_match(path.to_str().unwrap())
 }

@@ -1,28 +1,23 @@
-use std::{
-    env,
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+pub mod apply;
+pub mod changes;
+mod error;
+mod pull;
+pub mod utils;
+
+use std::{env, path::PathBuf, sync::Arc};
 
 use crate::{
     constants::config::general::{default_value, var_name},
-    modules::blog::components::check_update::{
-        apply::apply_deltas, pull::fetch_deltas, utils::expand_path,
+    modules::blog::components::{
+        check_update::{apply::apply_deltas, pull::fetch_deltas},
+        static_rsc::GIT_WORK_DIR,
     },
     scheduler::task_func::AsyncTaskFunc,
 };
 use macros::panic_with_log;
 
 use sqlx::PgPool;
-use tracing::{log::error, trace, warn, Level};
-
-// mod error;
-// mod index;
-mod apply;
-mod changes;
-mod error;
-mod pull;
-mod utils;
+use tracing::{Level, log::error, trace};
 
 #[derive(Debug)]
 struct Args {
@@ -34,22 +29,6 @@ struct Args {
 }
 
 pub fn task(db_connection: PgPool) -> impl AsyncTaskFunc {
-    // init
-    let git_work_dir = {
-        let path = if let Ok(default_log_path) = env::var(var_name::WORK_DIR) {
-            expand_path(default_log_path)
-        } else {
-            let fallback_path = expand_path(default_value::WORK_DIR.to_string());
-            warn!(
-                "unset env var `{}`, using default path: {}/blog_git",
-                var_name::WORK_DIR,
-                fallback_path
-            );
-            fallback_path
-        };
-        Path::new(&path).join("blog_git")
-    };
-
     // clone & check update
     let git_url = match env::var(var_name::BLOG_GIT_URL) {
         Ok(url) => url,
@@ -69,7 +48,7 @@ pub fn task(db_connection: PgPool) -> impl AsyncTaskFunc {
 
     let arc_args = Arc::new(Args {
         db_connection,
-        git_work_dir,
+        git_work_dir: GIT_WORK_DIR.clone(),
         git_url,
         git_remote_name,
         git_remote_branch,
