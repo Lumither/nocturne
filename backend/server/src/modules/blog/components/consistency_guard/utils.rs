@@ -1,8 +1,9 @@
-use crate::modules::blog::components::consistency_guard::error::Error;
 use std::{
     fs,
     path::{Path, PathBuf},
 };
+
+use crate::modules::blog::components::consistency_guard::error::Error;
 
 pub fn rec_find_dir_entries(entry: &Path) -> Result<Vec<PathBuf>, Error> {
     if !entry.exists() {

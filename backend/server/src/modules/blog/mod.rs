@@ -5,12 +5,8 @@ use crate::{
     modules::{
         Module,
         blog::{
-            api::{
-                get_page_count,
-                get_post,
-                // get_post_list::get_post_list,
-            },
-            components::{check_update, consistency_guard}, // cron::check_update,
+            api::{get_page_count, get_post},
+            components::{check_update, consistency_guard},
         },
     },
     scheduler::tasks::{CronTask, async_basic::AsyncBasic},
@@ -54,7 +50,6 @@ impl Module for Blog {
                 "Consistency Guard",
                 AsyncBasic::new(
                     consistency_guard::task(db_handler.clone()),
-                    // "*/15 * * * * *",
                     "*/15 * * * * *",
                 )
                 .unwrap()

@@ -18,6 +18,7 @@ const CREATE_RETURN_TAG_ID: &str = include_str!("sql/create_return_tag_id.sql");
 const CREATE_RETURN_CATEGORY_ID: &str = include_str!("sql/create_return_category_id.sql");
 const CREATE_POST_GENERAL: &str = include_str!("sql/create_post_general.sql");
 const CREATE_POST_TAGS: &str = include_str!("sql/create_post_tags.sql");
+const CREATE_POST_META: &str = include_str!("sql/create_post_meta.sql");
 
 pub async fn apply_deltas(db_conn: &PgPool, changes: Vec<Change>) {
     let handlers = changes
@@ -118,6 +119,19 @@ async fn handle_create(db: &PgPool, create: Create) {
         }
     };
 
+    const KEY_TO_SKIP: &[&str] = &[
+        "category", "status", "id", "date", "update", "tags", "title", "subtitle",
+    ];
+    let (post_meta_key, post_meta_value): (Vec<String>, Vec<String>) =
+        if let Some(kv) = create.payload.meta.as_object() {
+            kv.iter()
+                .filter(|(k, _)| !KEY_TO_SKIP.contains(&&***k))
+                .map(|(k, v)| (k.clone(), v.as_str().unwrap().to_string()))
+                .collect()
+        } else {
+            (vec![], vec![])
+        };
+
     let meta = create.payload.meta;
     let post_id = create.uuid;
     let post_identifier = &identifier;
@@ -167,6 +181,17 @@ async fn handle_create(db: &PgPool, create: Create) {
     if let Err(e) = query(CREATE_POST_TAGS)
         .bind(post_id)
         .bind(tag_ids)
+        .execute(&mut *tx)
+        .await
+    {
+        error!("failed to insert post {}: {}", &identifier, e);
+        return;
+    }
+
+    if let Err(e) = query(CREATE_POST_META)
+        .bind(post_id)
+        .bind(post_meta_key)
+        .bind(post_meta_value)
         .execute(&mut *tx)
         .await
     {
