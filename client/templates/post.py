@@ -10,7 +10,7 @@ from utils.lang import eprint, wprint
 
 POST_TEMPLATE = '''
 ---
-uuid: {{ uuid }}
+id: {{ id }}
 title: {{ title }}
 subtitle: {{ subtitle }}
 status: {{ status }}
@@ -83,6 +83,6 @@ class BlogPost(Template):
             update=dt.today().strftime("%Y-%m-%d"),
             tags=get_tags(),
             category=get_category(),
-            uuid=uuid.uuid4()
+            id=uuid.uuid4()
         )
         create_all_files(self.WORK_PATH.format(year=year, identifier="test"), self.ITEMS)
