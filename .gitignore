@@ -6,7 +6,7 @@
 .idea
 .vscode
 
-# exclude post repo
+# exclude content repo
 /blog_posts_git
 
 # rustc ICE dump

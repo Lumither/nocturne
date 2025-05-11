@@ -9,9 +9,6 @@ use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-const GET_POST_BY_UUID: &str = include_str!("get_post_by_uuid.sql");
-const GET_POST_BY_STR_ID: &str = include_str!("get_post_by_str_id.sql");
-
 pub async fn handler(
     State(db_connection): State<PgPool>,
     Path(identifier): Path<String>,
