@@ -4,18 +4,31 @@ use crate::{
 };
 
 use axum::{extract::State, http::StatusCode, response::Response};
-use serde::Serialize;
 use serde_json::{Value, json};
-use sqlx::{FromRow, PgPool, Row, query_as};
+use sqlx::{FromRow, PgPool, query_as};
 
-#[derive(FromRow, Serialize)]
+#[derive(FromRow)]
 struct DBPaginationRow {
     page_count: i32,
     total_count: i64,
 }
 
-impl From<DBPaginationRow> for Value {
+struct PaginationResponse {
+    page_count: i32,
+    total_count: i64,
+}
+
+impl From<DBPaginationRow> for PaginationResponse {
     fn from(value: DBPaginationRow) -> Self {
+        Self {
+            page_count: value.page_count,
+            total_count: value.total_count,
+        }
+    }
+}
+
+impl From<PaginationResponse> for Value {
+    fn from(value: PaginationResponse) -> Self {
         json!({
             "page_count": value.page_count,
             "total_count": value.total_count
@@ -36,7 +49,7 @@ pub async fn handler(State(db_connection): State<PgPool>) -> Response<String> {
     .fetch_one(&db_connection)
     .await
     {
-        Ok(res) => succ_resp(StatusCode::OK, res.into()),
+        Ok(res) => succ_resp(StatusCode::OK, PaginationResponse::from(res).into()),
         Err(e) => err_resp(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
     }
 }
