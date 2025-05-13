@@ -4,7 +4,7 @@ use axum::{
 };
 use serde_json::{Value, json};
 
-pub fn err_resp(code: StatusCode, err_msg: String) -> Response<String> {
+pub fn err_resp(code: StatusCode, err_msg: &str) -> Response<String> {
     let payload = json!({
         "status": "error",
         "data": {

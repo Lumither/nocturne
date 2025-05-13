@@ -5,7 +5,7 @@ use crate::{
     modules::{
         Module,
         blog::{
-            api::{posts, posts::pagination},
+            api::{posts, posts::get, posts::pagination},
             components::{check_update, consistency_guard},
         },
     },
@@ -27,11 +27,9 @@ impl Module for Blog {
         // todo: move resource init to new func
         // todo: remove debug comment
         Router::new()
-            // .route("/get_post_list", get(get_post_list))
-            // .route("/posts/pagination", get(...))
-            // .route("/posts", get(...)) // get posts
+            .route("/posts", get(get::handler))
+            .route("/posts/{identifier}", get(posts::get_identifier::handler))
             .route("/posts/pagination", get(pagination::handler))
-            .route("/posts/{identifier}", get(posts::get::handler))
             .with_state(db_handler)
     }
 

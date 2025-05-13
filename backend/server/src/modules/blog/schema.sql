@@ -60,6 +60,7 @@ CREATE INDEX idx_categories_name ON categories (name);
 CREATE INDEX idx_posts_identifier ON posts (identifier);
 CREATE INDEX idx_posts_status ON posts (status);
 CREATE INDEX idx_posts_category ON posts (category);
+CREATE INDEX idx_posts_date_created ON posts (date_created);
 CREATE INDEX idx_post_tag_post ON post_tag (post);
 CREATE INDEX idx_post_tag_tag ON post_tag (tag);
 CREATE INDEX idx_metadata_pid ON metadata (pid);
