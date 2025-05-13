@@ -4,13 +4,33 @@ use axum::{
 };
 use serde_json::{Value, json};
 
-pub fn err_resp(code: StatusCode, err_msg: &str) -> Response<String> {
-    let payload = json!({
+#[macro_export]
+macro_rules! err_resp_log {
+    ($code:expr, $msg:expr) => {{
+        use tracing::error;
+        use $crate::utils::axum_response::err_resp;
+
+        error!("{}", $msg);
+        err_resp($code, $msg, None)
+    }};
+    ($code:expr, $msg:expr, $body:expr) => {{
+        use tracing::error;
+        use $crate::utils::axum_response::err_resp;
+
+        error!("{}", $msg);
+        err_resp($code, $msg, Some($body))
+    }};
+}
+
+pub fn err_resp(code: StatusCode, err_msg: &str, body: Option<Value>) -> Response<String> {
+    let mut payload = json!({
         "status": "error",
-        "data": {
-            "msg": err_msg,
-        }
+        "msg": err_msg,
     });
+    if let Some(body) = body {
+        payload["data"] = body;
+    }
+
     resp_json(code, payload)
 }
 

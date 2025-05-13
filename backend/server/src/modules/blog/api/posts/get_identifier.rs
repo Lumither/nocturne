@@ -1,4 +1,4 @@
-use crate::utils::axum_response::{err_resp, succ_resp};
+use crate::{err_resp_log, utils::axum_response::succ_resp};
 
 use axum::{
     extract::{Path, State},
@@ -73,8 +73,10 @@ pub async fn handler(
         Ok(post) => post,
         Err(e) => {
             return match e {
-                sqlx::Error::RowNotFound => err_resp(StatusCode::NOT_FOUND, "no matching post"),
-                _ => err_resp(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()),
+                sqlx::Error::RowNotFound => {
+                    err_resp_log!(StatusCode::NOT_FOUND, "no matching post")
+                }
+                _ => err_resp_log!(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()),
             };
         }
     };

@@ -1,7 +1,4 @@
-use crate::{
-    constants::blog::PAGE_SIZE,
-    utils::axum_response::{err_resp, succ_resp},
-};
+use crate::{constants::blog::PAGE_SIZE, err_resp_log, utils::axum_response::succ_resp};
 
 use axum::{extract::State, http::StatusCode, response::Response};
 use serde_json::{Value, json};
@@ -50,6 +47,6 @@ pub async fn handler(State(db_connection): State<PgPool>) -> Response<String> {
     .await
     {
         Ok(res) => succ_resp(StatusCode::OK, PaginationResponse::from(res).into()),
-        Err(e) => err_resp(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()),
+        Err(e) => err_resp_log!(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()),
     }
 }
