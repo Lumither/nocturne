@@ -7,19 +7,19 @@ use sqlx::{FromRow, PgPool, query_as};
 #[derive(FromRow)]
 struct DBPaginationRow {
     page_count: i32,
-    total_count: i64,
+    post_count: i64,
 }
 
 struct PaginationResponse {
     page_count: i32,
-    total_count: i64,
+    post_count: i64,
 }
 
 impl From<DBPaginationRow> for PaginationResponse {
     fn from(value: DBPaginationRow) -> Self {
         Self {
             page_count: value.page_count,
-            total_count: value.total_count,
+            post_count: value.post_count,
         }
     }
 }
@@ -28,7 +28,7 @@ impl From<PaginationResponse> for Value {
     fn from(value: PaginationResponse) -> Self {
         json!({
             "page_count": value.page_count,
-            "total_count": value.total_count
+            "post_count": value.post_count
         })
     }
 }
@@ -36,9 +36,9 @@ impl From<PaginationResponse> for Value {
 pub async fn handler(State(db_connection): State<PgPool>) -> Response<String> {
     match query_as::<_, DBPaginationRow>(
         r#"
-        SELECT 
+        SELECT
             cast(ceil(count(*) / cast($1 AS FLOAT)) AS INTEGER) AS page_count,
-            count(*) AS total_count
+            count(*) AS post_count
         FROM posts;
     "#,
     )

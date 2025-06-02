@@ -28,7 +28,7 @@ struct SelectedPost {
     category: String,
     tags: Vec<String>,
     content: String,
-    metadata: Value,
+    metadata: Option<Value>,
 }
 
 #[derive(serde::Serialize, FromRow)]

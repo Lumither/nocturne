@@ -12,7 +12,7 @@ use axum::{
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::{query_as, FromRow, PgPool};
+use sqlx::{FromRow, PgPool, query_as};
 use uuid::Uuid;
 
 #[derive(FromRow, Serialize)]

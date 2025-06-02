@@ -36,7 +36,7 @@ const MinifyPostCard = (props: Props) => {
                             className="absolute transition-colors bg-zinc-300/80 dark:bg-gray-600/25 dark:backdrop-brightness-75 bottom-0  justify-between rounded-none">
                             <div>
                                 <p className="text-2xl font-bold">{ post['title'] }</p>
-                                <p className="">{ post['sub_title'] }</p>
+                                <p className="">{ post.subtitle }</p>
                             </div>
                         </CardFooter>
                     </div>
@@ -46,7 +46,7 @@ const MinifyPostCard = (props: Props) => {
                         <div className={ 'flex flex-col max-h-fit text-left' }>
                             <p className={ 'text-3xl font-bold text-balance' }>{ post['title'] }</p>
                             <div className={ 'w-1/4 h-[2px] my-2 bg-zinc-500 dark:bg-zinc-400' }></div>
-                            <p className={ 'text-xl text-pretty break-words' }>{ post['sub_title'] }</p>
+                            <p className={ 'text-xl text-pretty break-words' }>{ post.subtitle }</p>
                         </div>
                     </div>
                 }

@@ -1,22 +1,17 @@
-import React, { cache } from 'react';
+import React from 'react';
 import PostCard from '@/app/(pages)/blog/post/[id]/PostCard';
 import ButtonGoBack from '@/app/(pages)/blog/post/[id]/ButtonGoBack';
 import * as motion from 'motion/react-client';
-import { fetchNocturneApi } from '@/app/(pages)/blog/api';
 import { Metadata } from 'next';
 import { SITE_CONFIG } from '@/src/constants';
-
-const fetchPost = cache(async (id: string) => {
-    const res = await fetchNocturneApi(`/blog/get_post/${ id }`);
-    // throw Error('Not Found');
-    return await res.json();
-});
+import { fetchPost } from '@/src/api/blog/post';
 
 export async function generateMetadata(
     { params }: { params: Promise<{ id: string }> })
     : Promise<Metadata> {
     try {
-        const title = (await fetchPost((await params).id)).title as string;
+        const response = await fetchPost((await params).id);
+        const title = response.data.post.title;
         return {
             title: `${ title } - ${ SITE_CONFIG.name }`
         };
@@ -33,7 +28,7 @@ async function BlogReader({
     params: Promise<{ id: string }>
 }) {
     try {
-        let post = await fetchPost((await params).id);
+        let post = (await fetchPost((await params).id)).data;
 
         return (
             <motion.div

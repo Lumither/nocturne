@@ -3,14 +3,9 @@ import Image from 'next/image';
 import { Chip } from '@nextui-org/react';
 import { MdCalendarMonth } from 'react-icons/md';
 
-// type Props = {
-//     post: any
-// };
-
 type Props = {
     title: string;
     subtitle: string;
-    summary: string | undefined;
     category: string;
     tags: string[];
     first_update: string;
