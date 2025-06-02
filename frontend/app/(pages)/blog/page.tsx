@@ -6,7 +6,7 @@ import { fetchPostListPagination } from '@/src/api/blog/post';
 async function Blog({
     searchParams
 }: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+    searchParams: Promise<{ [_: string]: string | string[] | undefined }>
 }) {
 
     const parsePage = Number((await searchParams)?.page);
