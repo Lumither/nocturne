@@ -3,27 +3,28 @@ import MinifyPostCard from '@/app/(pages)/blog/post/[id]/MinifyPostCard';
 import Link from 'next/link';
 import { FaCreativeCommons } from 'react-icons/fa6';
 
+interface AdjacentPosts {
+    prev: any;
+    next: any;
+}
+
 type Props = {
-    // post: any
-    post_id: string;
-    adjacent_posts: any
-    perm_link: string | undefined;
-    author: string | undefined;
-    author_link: string | undefined;
+    adjacent_posts: AdjacentPosts
+    perm_link: string;
+    author: string;
+    author_link: string;
     first_update: string;
-    last_update: string | undefined;
+    last_update: string | null;
     cc: string | undefined;
     title: string;
 }
 
 const Footer = (props: Props) => {
-    const { adjacent_posts, perm_link, post_id, first_update, last_update, title } = props;
+    const { adjacent_posts, perm_link, author_link, author, first_update, last_update, title } = props;
 
     const prev_post = adjacent_posts.prev;
     const next_post = adjacent_posts.next;
-    const link = perm_link ?? `https://lumither.com/blog/post/${ post_id }`;
-    const author = props.author ?? 'Tao';
-    const author_link = props.author_link ?? '/about/me';
+    const link = perm_link;
     const post_date = new Date(first_update);
     const update_date: Date | undefined = last_update ? new Date(last_update) : undefined;
     const cc = props.cc ?? 'by-nc-sa';

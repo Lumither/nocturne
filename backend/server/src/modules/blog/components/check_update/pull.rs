@@ -1,9 +1,13 @@
-use std::{collections::HashMap, fs::remove_dir_all, path::PathBuf};
+use std::{collections::HashMap, fs::remove_dir_all, path::Path, path::PathBuf};
 
 use crate::{
-    modules::blog::components::check_update::{
-        changes::{Change, Create, CreateDelete2UpdateSlot, Delete, Update},
-        error::Error,
+    modules::blog::components::{
+        check_update::{
+            changes::{Change, Create, CreateDelete2UpdateSlot, Delete, Update},
+            error::Error,
+            utils::extract_post_id,
+        },
+        static_rsc::BLOG_POST_PATH_PATTERN,
     },
     utils::{git, git::FileDelta},
 };
@@ -64,18 +68,21 @@ pub async fn fetch_deltas(
 
     // process deleted deltas before merging commit to prevent "file not found" os error
     for delta in commit_deltas.into_iter() {
-        // todo: limit scanning scope to post only OR extract merging logic to external component
+        let relative_file_path = delta
+            .new_path
+            .clone()
+            .expect("cannot parse modified post `new_path`");
+
+        if !should_delta_tracked(&relative_file_path) {
+            continue;
+        }
 
         if delta.status == Delta::Deleted {
-            let file_path = &git_work_dir.join(
-                delta
-                    .new_path
-                    .expect("cannot parse modified post `new_path`"),
-            );
+            let file_path = &git_work_dir.join(relative_file_path);
             if let Some(id) = extract_post_id(&MdFile::from_file(file_path)?) {
                 changes.push(Change::Delete(Delete {
                     uuid: id,
-                    path: file_path.clone(),
+                    path: Some(file_path.clone()),
                 }))
             } else {
                 error!("failed to parse uuid for file {}", file_path.display());
@@ -131,16 +138,9 @@ pub async fn fetch_deltas(
     }
 
     // merge adds and deletes deltas to moves
-    let changes = dbg!(merge_changes(changes));
+    let changes = merge_changes(changes);
 
     Ok(changes)
-}
-
-fn extract_post_id(post: &MdFile) -> Option<Uuid> {
-    match post.meta["uuid"].as_str() {
-        Some(id) => Uuid::parse_str(id).ok(),
-        None => None,
-    }
 }
 
 fn merge_changes(changes: Vec<Change>) -> Vec<Change> {
@@ -168,4 +168,8 @@ fn merge_changes(changes: Vec<Change>) -> Vec<Change> {
     }
 
     merged
+}
+
+fn should_delta_tracked(path: &Path) -> bool {
+    BLOG_POST_PATH_PATTERN.is_match(path.to_str().unwrap())
 }

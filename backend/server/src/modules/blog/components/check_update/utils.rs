@@ -7,7 +7,9 @@ use crate::constants::{
 
 use chrono::NaiveDate;
 use dirs::home_dir;
+use markdown::MdFile;
 use tracing::warn;
+use uuid::Uuid;
 
 pub fn expand_path(path: String) -> String {
     if path.starts_with('~') {
@@ -28,6 +30,13 @@ pub fn expand_path(path: String) -> String {
             })
     } else {
         path
+    }
+}
+
+pub fn extract_post_id(post: &MdFile) -> Option<Uuid> {
+    match post.meta["id"].as_str() {
+        Some(id) => Uuid::parse_str(id).ok(),
+        None => None,
     }
 }
 

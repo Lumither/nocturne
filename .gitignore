@@ -6,7 +6,11 @@
 .idea
 .vscode
 
-# exclude post repo
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# exclude content repo
 /blog_posts_git
 
 # rustc ICE dump

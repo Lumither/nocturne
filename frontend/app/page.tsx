@@ -5,14 +5,13 @@ import { useScreenSizeTrigger } from '@/app/(pages)/public/screenSizeTrigger';
 import { Button } from '@nextui-org/react';
 import { entries } from '@/app/entries';
 import Link from 'next/link';
-import { useLocalStorage } from 'react-use';
 
 export default function Home() {
 
     const isMobile = useScreenSizeTrigger('lg');
 
-    const [ test, setTest, removeTest ] = useLocalStorage('test', 'test_value');
-    console.log(test);
+    // const [ test, setTest, removeTest ] = useLocalStorage('test', 'test_value');
+    // console.log(test);
     // setTest('test value 2');
     // console.log(test);
     // removeTest();

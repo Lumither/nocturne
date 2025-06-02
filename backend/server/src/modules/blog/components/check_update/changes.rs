@@ -17,7 +17,7 @@ pub enum Change {
 #[derive(Debug, Clone)]
 pub struct Delete {
     pub uuid: Uuid,
-    pub path: PathBuf,
+    pub path: Option<PathBuf>,
 }
 
 #[allow(dead_code)]
@@ -56,7 +56,7 @@ impl CreateDelete2UpdateSlot {
         match (&self.create, &self.delete) {
             (Some(create), Some(delete)) => Some(Change::Move(Move {
                 uuid: create.uuid,
-                from: delete.path.clone(),
+                from: delete.path.clone()?,
                 to: create.path.clone(),
                 payload: create.payload.clone(),
             })),

@@ -1,21 +1,15 @@
 mod api;
 mod components;
 
-use crate::modules::blog::components::check_update;
-use crate::scheduler::tasks::async_basic::AsyncBasic;
 use crate::{
     modules::{
         Module,
         blog::{
-            api::{
-                get_page_count,
-                get_post,
-                // get_post_list::get_post_list,
-            },
-            // cron::check_update,
+            api::{posts, posts::get, posts::pagination},
+            components::{check_update, consistency_guard},
         },
     },
-    scheduler::tasks::CronTask,
+    scheduler::tasks::{CronTask, async_basic::AsyncBasic},
 };
 
 use axum::{Router, routing::get};
@@ -33,9 +27,9 @@ impl Module for Blog {
         // todo: move resource init to new func
         // todo: remove debug comment
         Router::new()
-            // .route("/get_post_list", get(get_post_list))
-            .route("/get_page_count", get(get_page_count::handler))
-            .route("/get_post/{identifier}", get(get_post::handler))
+            .route("/posts", get(get::handler))
+            .route("/posts/{identifier}", get(posts::get_identifier::handler))
+            .route("/posts/pagination", get(pagination::handler))
             .with_state(db_handler)
     }
 
@@ -45,11 +39,22 @@ impl Module for Blog {
 
     fn get_cron_tasks(&self) -> Vec<(&str, Box<dyn CronTask>)> {
         let db_handler = self.db_handler.clone();
-        vec![(
-            "Blog Check Update",
-            AsyncBasic::new(check_update::task(db_handler.clone()), "*/5 * * * * *")
+        vec![
+            (
+                "Blog Check Update",
+                AsyncBasic::new(check_update::task(db_handler.clone()), "*/5 * * * * *")
+                    .unwrap()
+                    .to_task(),
+            ),
+            (
+                "Consistency Guard",
+                AsyncBasic::new(
+                    consistency_guard::task(db_handler.clone()),
+                    "*/15 * * * * *",
+                )
                 .unwrap()
                 .to_task(),
-        )]
+            ),
+        ]
     }
 }

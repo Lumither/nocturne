@@ -14,8 +14,7 @@ CREATE TABLE categories
 
 CREATE TABLE post_status
 (
-    id   SERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE NOT NULL
+    name VARCHAR(20) PRIMARY KEY
 );
 
 INSERT INTO post_status (name)
@@ -27,14 +26,15 @@ VALUES ('draft'),
 CREATE TABLE posts
 (
     id           UUID PRIMARY KEY,
-    identifier   VARCHAR(100) UNIQUE                           NOT NULL,
-    title        VARCHAR(255)                                  NOT NULL,
-    subtitle     VARCHAR(255)                                  NOT NULL,
-    date_created DATE                                          NOT NULL,
+    identifier   VARCHAR(100) UNIQUE                       NOT NULL,
+    title        VARCHAR(255)                              NOT NULL,
+    subtitle     VARCHAR(255)                              NOT NULL,
+    date_created DATE                                      NOT NULL,
     date_updated DATE,
-    status       INTEGER REFERENCES post_status (id) DEFAULT 1 NOT NULL,
-    content      TEXT                                          NOT NULL,
-    category     INTEGER REFERENCES categories (id)            NOT NULL
+    status       VARCHAR(20) REFERENCES post_status (name) NOT NULL,
+    content      TEXT                                      NOT NULL,
+    hash         VARCHAR(44)                               NOT NULL,
+    category     INTEGER REFERENCES categories (id)        NOT NULL
 );
 
 CREATE TABLE post_tag
@@ -60,6 +60,7 @@ CREATE INDEX idx_categories_name ON categories (name);
 CREATE INDEX idx_posts_identifier ON posts (identifier);
 CREATE INDEX idx_posts_status ON posts (status);
 CREATE INDEX idx_posts_category ON posts (category);
+CREATE INDEX idx_posts_date_created ON posts (date_created);
 CREATE INDEX idx_post_tag_post ON post_tag (post);
 CREATE INDEX idx_post_tag_tag ON post_tag (tag);
 CREATE INDEX idx_metadata_pid ON metadata (pid);

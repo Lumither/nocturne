@@ -1,3 +1,4 @@
 pub mod check_update;
-mod consistency_guard;
-mod rag;
+pub mod consistency_guard;
+pub mod rag;
+mod static_rsc;
