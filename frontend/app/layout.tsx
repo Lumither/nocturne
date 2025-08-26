@@ -21,6 +21,9 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
         <body className={ `transition duration-300 dark:bg-[#282830] min-h-screen` }>
         <NextThemesProvider attribute="class" defaultTheme="system">
+            <div className={ 'fixed top-0 w-full h-15 bg-yellow-600 z-50' }>
+                <p className={ 'font-bold text-2xl text-center' }>*System Under Construction*</p>
+            </div>
             { children }
         </NextThemesProvider>
         </body>

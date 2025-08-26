@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 export default function Home() {
 
-    const isMobile = useScreenSizeTrigger('lg');
+    const isMobile = useScreenSizeTrigger('sm');
 
     return (
         <div>
@@ -47,7 +47,7 @@ export default function Home() {
                                             href={ meta.href }
                                         >
                                             { meta.icon }
-                                            <p className={ `font-bold hidden lg:block` }>{ meta.display_name }</p>
+                                            <p className={ `font-bold hidden sm:block` }>{ meta.display_name }</p>
                                         </Button>
                                     </li>
                                 ))
