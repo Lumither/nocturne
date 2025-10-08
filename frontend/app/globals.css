@@ -1,4 +1,4 @@
-@import "lxgw-wenkai-webfont/style.css";
+@import "lxgw-wenkai-webfont/lxgwwenkai-light.css";
 
 @tailwind base;
 @tailwind components;
@@ -6,8 +6,10 @@
 
 body {
     font-family: "LXGW WenKai", sans-serif;
+    /*font-family: "Arial", "monospace", sans-serif;*/
 }
 
 pre, code {
-    font-family: "LXGW WenKai Mono", sans-serif;
+    /*font-family: "monospace", sans-serif;*/
+    font-family: "monospace", sans-serif;
 }

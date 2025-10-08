@@ -24,7 +24,7 @@ type Props = {
 function BlogPostCard({ post }: Props) {
     return (
         <div className={ `w-full` }>
-            <Card as={ Link } href={ `/blog/post/${ post.id }` }
+            <Card as={ Link } href={ `/blog/post/${ post.identifier }` }
                   className={ `group` }
                   isPressable
                   isHoverable

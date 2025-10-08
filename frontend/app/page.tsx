@@ -5,14 +5,19 @@ import { useScreenSizeTrigger } from '@/app/(pages)/public/screenSizeTrigger';
 import { Button } from '@nextui-org/react';
 import { entries } from '@/app/entries';
 import Link from 'next/link';
+import BoxesGL from '@/components/BackgroundBoxGL';
+import { BoxesCore } from '@/components/BackgroundBox';
 
 export default function Home() {
 
     const isMobile = useScreenSizeTrigger('sm');
 
     return (
-        <div>
-            <div className={ `min-h-dvh h-min content-center` }>
+        <div className={ 'h-dvh w-full overflow-hidden relative' }>
+            {/*<BoxesGL />*/ }
+            <BoxesCore />
+
+            <div className={ `min-h-dvh h-min content-center z-20` }>
                 <p className={ 'text-center text-4xl' }>Atelier Lumiaethor</p>
             </div>
 
@@ -21,7 +26,8 @@ export default function Home() {
                 className={ 'absolute bottom-0 w-full h-60 p-12' }
             >
                 <div
-                    className={ 'bg-blue-500 h-full w-full rounded-3xl backdrop-blur align-middle grid grid-cols-2 content-center' }>
+                    // className={ 'bg-blue-500 h-full w-full rounded-3xl backdrop-blur align-middle grid grid-cols-2 content-center' }>
+                    className={ 'h-full w-full rounded-3xl backdrop-blur align-middle grid grid-cols-2 content-center' }>
 
                     <div className={ 'w-full flex justify-between' }>
                         <div className={ 'p-16' }>

@@ -1,20 +1,22 @@
 import { fetchNocturneJson } from '@/src/api/endpoint';
 
-const DEFAULT_PAGE_SIZE = 6;
+const DEFAULT_PAGE_SIZE = 8;
+
+export interface Post {
+    id: string,
+    identifier: string,
+    title: string,
+    subtitle: string,
+    tags: string[]
+    category: string,
+    date_created: Date,
+    date_updated: Date | null,
+    header_img: string | null
+}
 
 export interface PostListResponse {
     data: {
-        posts: {
-            id: string,
-            identifier: string,
-            title: string,
-            subtitle: string,
-            tags: string[]
-            category: string,
-            date_created: Date,
-            date_updated: Date | null,
-            header_img: string | null
-        }[],
+        posts: Post[],
         pagination: {
             page: number,
             page_count: number,
