@@ -4,16 +4,64 @@ use crate::{
     utils::axum_response::{err_resp, succ_resp},
 };
 
-use axum::{
-    extract::{Query, State},
-    http::StatusCode,
-    response::IntoResponse,
-};
+use std::collections::HashSet;
+
+use axum::{extract::State, http::StatusCode, response::IntoResponse};
+use axum_extra::extract::Query;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::{FromRow, PgPool, query_as};
+use sqlx::{query_as, FromRow, PgPool};
 use uuid::Uuid;
+
+fn tags_deserializer<'de, D>(deserializer: D) -> Result<Option<Vec<String>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let deserialize_each = |input: String| -> Result<Vec<String>, D::Error> {
+        Ok(input.split(',').map(|s| s.to_string()).collect())
+    };
+
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum Cardinality {
+        One(String),
+        Many(Vec<String>),
+    }
+    let cardinality: Option<Cardinality> = Deserialize::deserialize(deserializer)?;
+
+    let mut tags = HashSet::new();
+
+    match cardinality {
+        Some(Cardinality::One(s)) => {
+            for item in deserialize_each(s)? {
+                let item = item.trim().to_string();
+                if !item.is_empty() {
+                    tags.insert(item);
+                }
+            }
+            let ret = tags.into_iter().collect::<Vec<_>>();
+            Ok(if ret.is_empty() { None } else { Some(ret) })
+        }
+        Some(Cardinality::Many(v)) => {
+            for items in v
+                .into_iter()
+                .map(deserialize_each)
+                .collect::<Result<Vec<_>, _>>()?
+            {
+                for item in items {
+                    let item = item.trim().to_string();
+                    if !item.is_empty() {
+                        tags.insert(item);
+                    }
+                }
+            }
+            let ret = tags.into_iter().collect::<Vec<_>>();
+            Ok(if ret.is_empty() { None } else { Some(ret) })
+        }
+        None => Ok(None),
+    }
+}
 
 #[derive(FromRow, Serialize)]
 struct PostBriefModel {
@@ -29,9 +77,15 @@ struct PostBriefModel {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct Pagination {
+pub struct SearchParams {
     page: Option<u32>,
     page_size: Option<u32>,
+
+    #[serde(default, deserialize_with = "tags_deserializer")]
+    tags: Option<Vec<String>>,
+
+    #[serde(default)]
+    match_all: bool,
 }
 
 #[derive(Serialize)]
@@ -53,13 +107,18 @@ struct UuidRow {
 }
 
 const GET_POST_WITH_BRIEF_MODEL: &str = include_str!("get_post_with_brief_model.sql");
+const SELECT_POST_WITH_TAG_FILTER_PAGINATED: &str =
+    include_str!("select_post_with_tag_filter_paginated.sql");
 
 pub async fn handler(
     State(db): State<PgPool>,
-    Query(pagination): Query<Pagination>,
+    Query(search_params): Query<SearchParams>,
 ) -> impl IntoResponse {
-    let page = pagination.page.unwrap_or(1);
-    let page_size = pagination.page_size.unwrap_or(PAGE_SIZE);
+    dbg!(&search_params.tags);
+    dbg!(&search_params.match_all);
+
+    let page = search_params.page.unwrap_or(1);
+    let page_size = search_params.page_size.unwrap_or(PAGE_SIZE);
     let page_count = match sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM posts")
         .fetch_one(&db)
         .await
@@ -84,13 +143,13 @@ pub async fn handler(
 
     let offset = page_size * (page - 1);
 
-    let ids = match query_as::<_, UuidRow>(
-        "SELECT id FROM posts ORDER BY date_created DESC LIMIT $1 OFFSET $2",
-    )
-    .bind(page_size as i32)
-    .bind(offset as i32)
-    .fetch_all(&db)
-    .await
+    let ids = match query_as::<_, UuidRow>(SELECT_POST_WITH_TAG_FILTER_PAGINATED)
+        .bind(search_params.tags)
+        .bind(page_size as i32)
+        .bind(offset as i32)
+        .bind(search_params.match_all)
+        .fetch_all(&db)
+        .await
     {
         Ok(res) => res.into_iter().map(|item| item.id).collect::<Vec<_>>(),
         Err(e) => return err_resp_log!(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()),
