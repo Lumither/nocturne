@@ -16,7 +16,5 @@ WITH filtered_posts AS
                                  AND t.name = ANY ($1::text[]))
                   END
               ))
-SELECT id
-FROM filtered_posts
-ORDER BY date_created DESC
-LIMIT $2 OFFSET $3;
+SELECT COUNT(*) AS total_count
+FROM filtered_posts;

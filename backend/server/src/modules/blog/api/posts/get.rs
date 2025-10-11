@@ -106,20 +106,25 @@ struct UuidRow {
     id: Uuid,
 }
 
-const GET_POST_WITH_BRIEF_MODEL: &str = include_str!("get_post_with_brief_model.sql");
+const I32_PLACEHOLDER: i32 = 0;
+
+const COUNT_TAG_FILTERED_POSTS: &str = include_str!("count_tag_filtered_posts.sql");
 const SELECT_POST_WITH_TAG_FILTER_PAGINATED: &str =
     include_str!("select_post_with_tag_filter_paginated.sql");
+const GET_POST_WITH_BRIEF_MODEL: &str = include_str!("get_post_with_brief_model.sql");
 
 pub async fn handler(
     State(db): State<PgPool>,
     Query(search_params): Query<SearchParams>,
 ) -> impl IntoResponse {
-    dbg!(&search_params.tags);
-    dbg!(&search_params.match_all);
-
     let page = search_params.page.unwrap_or(1);
     let page_size = search_params.page_size.unwrap_or(PAGE_SIZE);
-    let page_count = match sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM posts")
+
+    let page_count = match sqlx::query_scalar::<_, i64>(COUNT_TAG_FILTERED_POSTS)
+        .bind(&search_params.tags)
+        .bind(I32_PLACEHOLDER) // not used, but help sqlx/psql hit cache
+        .bind(I32_PLACEHOLDER)
+        .bind(search_params.match_all)
         .fetch_one(&db)
         .await
     {
