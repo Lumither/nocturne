@@ -26,9 +26,26 @@ export interface PostListResponse {
     status: string
 }
 
+interface FetchPostListParams {
+    page: number;
+    page_size?: number;
+    tag_filter?: string[];
+    match_all?: boolean;
+}
 
-export async function fetchPostList(page: number, page_size: number = DEFAULT_PAGE_SIZE): Promise<PostListResponse> {
-    const url = `/blog/posts?page=${ page }&page_size=${ page_size }`;
+export async function fetchPostList({
+        page,
+        page_size = DEFAULT_PAGE_SIZE,
+        tag_filter = [],
+        match_all = false
+    }: FetchPostListParams
+): Promise<PostListResponse> {
+    const pagination_string = `page=${ page }&page_size=${ page_size }`;
+    const tag_filter_string = tag_filter.length != 0
+        ? `&tags=${ tag_filter.join(',') }&match_all=${ match_all }`
+        : '';
+
+    const url = `/blog/posts?${ pagination_string }${ tag_filter_string }`;
     return await fetchNocturneJson(url);
 }
 

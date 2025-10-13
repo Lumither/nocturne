@@ -7,7 +7,16 @@ import * as motion from 'motion/react-client';
 import { AnimatePresence } from 'motion/react';
 import { Post } from '@/src/api/blog/post';
 
-const PostList = ({ posts }: { posts: Post[] }) => {
+export interface HighlightSelector {
+    tags?: string[];
+}
+
+interface Props {
+    posts: Post[];
+    highlight: HighlightSelector;
+}
+
+const PostList = ({ posts, highlight }: Props) => {
     return (
         <div className={ 'w-full' }>
             <ul className={ 'flex flex-col items-center w-full space-y-7' }>
@@ -19,7 +28,7 @@ const PostList = ({ posts }: { posts: Post[] }) => {
                             transition={ { ease: 'easeOut', duration: 0.5, delay: key * .1 + .1 } }
                             key={ key }
                             className={ 'w-full' }>
-                            <BlogPostCard post={ post } />
+                            <BlogPostCard post={ post } highlightSelector={ highlight } />
                         </motion.li>)
                     ) }
                 </AnimatePresence>

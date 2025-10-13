@@ -14,7 +14,7 @@ function Layout({
             <motion.div
                 initial={ { opacity: 0 } }
                 animate={ { opacity: 1 } }
-                transition={ { ease: 'easeInOut', duration: 0.3, delay: 0.5 } }
+                transition={ { ease: 'easeInOut', duration: 0.3, delay: 0.1 } }
                 className={ `justify-center flex flex-row w-full max-w-full` }>
                 <Navbar />
                 <div className={ `flex flex-col flex-1 max-w-[1024px] min-w-0` }>

@@ -1,19 +1,19 @@
-'use server';
-
 import React from 'react';
-import { fetchPostList } from '@/src/api/blog/post';
-import AnimationPostList from '@/app/(pages)/blog/post/components/AnimationPostList';
+import { Post } from '@/src/api/blog/post';
+import AnimationPostList, { HighlightSelector } from '@/app/(pages)/blog/post/components/AnimationPostList';
 
-const PostList = async ({ page }: { page: number }) => {
+interface Props {
+    posts: Post[],
+    tags: string[] | undefined
+}
+
+const PostList = async ({ posts, tags }: Props) => {
     try {
-        const postListResponse = await fetchPostList(page);
-
-        const posts = postListResponse.data.posts;
-
         return (
-            // blog list
             <div className={ 'w-full' }>
-                <AnimationPostList posts={ posts } />
+                <AnimationPostList posts={ posts } highlight={ {
+                    tags: tags
+                } } />
             </div>
         );
     } catch (e: any) {

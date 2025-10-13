@@ -4,6 +4,8 @@ import { Chip } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MdCalendarMonth, MdNorthEast } from 'react-icons/md';
+import { HighlightSelector } from '@/app/(pages)/blog/post/components/AnimationPostList';
+import TagChip from '@/app/(pages)/blog/TagChip';
 
 interface Post {
     id: string,
@@ -19,15 +21,20 @@ interface Post {
 
 type Props = {
     post: Post
+
+    highlightSelector: HighlightSelector,
 }
 
-function BlogPostCard({ post }: Props) {
+function BlogPostCard({ post, highlightSelector }: Props) {
+    const highlightTags = highlightSelector?.tags;
+
     return (
         <div className={ `w-full` }>
-            <Card as={ Link } href={ `/blog/post/${ post.identifier }` }
-                  className={ `group` }
-                  isPressable
-                  isHoverable
+            <Card
+                as={ Link } href={ `/blog/post/${ post.identifier }` }
+                className={ `group w-full` }
+                isPressable
+                isHoverable
             >
 
                 { post.header_img && <div className={ `w-full overflow h-80 relative` }>
@@ -63,12 +70,26 @@ function BlogPostCard({ post }: Props) {
                     <div className={ `flex flex-row flex-wrap justify-between w-full` }>
                         <div>
                             <ul className={ `flex flex-row flex-wrap` }>
-                                {
-                                    post.tags.map((tag: string, key: any) => (
-                                        <li key={ key } className={ `mx-1 mb-1` }>
-                                            <Chip>{ tag }</Chip>
-                                        </li>
-                                    ))
+                                {/*highlight*/
+                                    post.tags
+                                        .filter((tag) => highlightTags?.includes(tag))
+                                        .sort()
+                                        .map((tag: string, key: any) => (
+                                            <li key={ key } className={ `mx-1 mb-1` }>
+                                                <TagChip tagName={ tag } isHighlighted={ true } />
+                                            </li>
+                                        ))
+                                }
+
+                                {/*normal */
+                                    post.tags
+                                        .filter((tag) => !highlightTags?.includes(tag))
+                                        .sort()
+                                        .map((tag: string, key: any) => (
+                                            <li key={ key } className={ `mx-1 mb-1` }>
+                                                <TagChip tagName={ tag } isHighlighted={ false } />
+                                            </li>
+                                        ))
                                 }
                             </ul>
                         </div>
