@@ -8,7 +8,7 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'pic.re'
+                hostname: 'cdn.jsdelivr.net'
             }
         ]
     },

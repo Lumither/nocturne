@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Chip } from '@nextui-org/react';
 import { MdCalendarMonth } from 'react-icons/md';
+import TagChip from '@/app/(pages)/blog/post/[id]/TagChip';
 
 type Props = {
     title: string;
@@ -50,7 +51,7 @@ const Headers = (post: Props) => {
                             {
                                 post.tags.map((tag: string, key: any) => (
                                     <li key={ key } className={ `mx-1 mb-1` }>
-                                        <Chip>{ tag }</Chip>
+                                        <TagChip tag={ tag } />
                                     </li>
                                 ))
                             }

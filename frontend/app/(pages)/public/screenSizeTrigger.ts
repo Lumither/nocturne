@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 const screenSize = new Map<string, number>(
     [
+        [ 'xs', 480 ],
         [ 'sm', 640 ],
         [ 'md', 768 ],
         [ 'lg', 1024 ],

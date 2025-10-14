@@ -17,7 +17,7 @@ const MinifyPostCard = (props: Props) => {
                   className="w-full h-[300px] shadow-none border-0 rounded-none overflow-hidden"
                   as={ Link }
                   isPressable
-                  href={ `/blog/post/${ post['id'] }` }
+                  href={ `/blog/post/${ post['identifier'] }` }
             >
                 <CardHeader className="absolute z-10 top-1 flex-col items-start">
                     <p className={ `text-tiny uppercase font-bold ${ img_url ? 'text-white/60' : 'text-black/60 dark:text-white/60' }` }>{ desc }</p>

@@ -8,7 +8,9 @@ import { useScreenSizeTrigger } from '@/app/(pages)/public/screenSizeTrigger';
 const Pagination = ({ total }: {
     total: number,
 }) => {
-    const parsePage = Number(useSearchParams().get('page'));
+    const searchParams = useSearchParams();
+
+    const parsePage = Number(searchParams.get('page'));
     const currPage = parsePage > 0 ? parsePage : 1;
 
     const router = useRouter();
@@ -27,7 +29,10 @@ const Pagination = ({ total }: {
                 color={ 'default' }
                 variant={ 'light' }
                 onChange={ (page) => {
-                    router.push(`?page=${ page }`, { scroll: false });
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set('page', page.toString());
+                    const queryString = params.toString();
+                    router.push(`?${ queryString }`, { scroll: false });
                 } }
             />
         </div>

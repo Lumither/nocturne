@@ -8,6 +8,7 @@ macros = { path = "../macros" }
 markdown = { path = "../markdown" }
 
 axum = { version = "0.8.1", features = ["macros"] }
+axum-extra = { version = "0.10.3", features = ["query"] }
 tracing = { version = "0.1.41", features = ["log"] }
 git2 = "0.20.0"
 chrono = { version = "0.4.39", features = ["serde"] }
