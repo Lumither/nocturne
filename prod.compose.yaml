@@ -57,3 +57,4 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
+    restart: always
