@@ -10,7 +10,7 @@ const TagChip = ({ tag }: { tag: string }) => {
     return (
         <div onClick={ () => router.push(`/blog?tags=${ tag }`) }>
             <Chip
-                className={ 'hover:border-amber-400 hover:dark:border-amber-700  transition-all' }
+                className={ 'hover:border-amber-400 hover:dark:border-amber-700  transition-all dark:bg-[#353540] dark:border-amber-50/25' }
                 variant={ 'faded' }
             >{ tag }</Chip>
         </div>

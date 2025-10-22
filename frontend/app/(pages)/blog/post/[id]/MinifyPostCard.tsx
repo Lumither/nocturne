@@ -12,9 +12,9 @@ const MinifyPostCard = (props: Props) => {
     const { post, desc } = props;
     const img_url = post['header_img'] as string;
     return (
-        <div className={ 'w-full transition hover:brightness-75' }>
+        <div className={ 'w-full transition hover:brightness-90' }>
             <Card isFooterBlurred
-                  className="w-full h-[300px] shadow-none border-0 rounded-none overflow-hidden"
+                  className="w-full h-[300px] shadow-none border-0 rounded-none overflow-hidden dark:bg-[#353540]"
                   as={ Link }
                   isPressable
                   href={ `/blog/post/${ post['identifier'] }` }

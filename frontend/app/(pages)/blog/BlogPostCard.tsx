@@ -32,7 +32,7 @@ function BlogPostCard({ post, highlightSelector }: Props) {
         <div className={ `w-full` }>
             <Card
                 as={ Link } href={ `/blog/post/${ post.identifier }` }
-                className={ `group w-full` }
+                className={ `group w-full dark:bg-[#353540]` }
                 isPressable
                 isHoverable
             >

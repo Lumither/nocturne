@@ -3,6 +3,7 @@
 import React from 'react';
 import { Chip } from '@nextui-org/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { cn } from '@/src/utils';
 
 interface TagChipProps {
     tagName: string,
@@ -37,7 +38,10 @@ const TagChip = ({ tagName, isHighlighted }: TagChipProps) => {
             className="cursor-pointer relative"
         >
             <Chip
-                className={ 'hover:border-amber-400 hover:dark:border-amber-700  transition-all' }
+                className={ cn(
+                    'hover:border-amber-400 hover:dark:border-amber-700  transition-all ',
+                    !isHighlighted && 'dark:border-amber-50/25'
+                ) }
                 variant={ 'bordered' }
                 color={ isHighlighted ? 'warning' : 'default' }
             >{ tagName }</Chip>

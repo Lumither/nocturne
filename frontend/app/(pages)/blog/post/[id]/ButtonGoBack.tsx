@@ -12,7 +12,7 @@ const ButtonGoBack = () => {
         <Button
             startContent={ <IoArrowBackOutline /> }
             variant={ 'light' }
-            onClick={ () => router.back() }
+            onPress={ () => router.back() }
         >
             { 'Back' }
         </Button>

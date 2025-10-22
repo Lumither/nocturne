@@ -16,7 +16,7 @@ async function PostCard(props: Props) {
 
     return (
         <div>
-            <Card className={ `max-w-full relative` }>
+            <Card className={ `max-w-full relative dark:bg-[#34343e]` }>
 
                 {/* card headers */ }
                 <Headers title={ post.title }

@@ -33,7 +33,7 @@ const Footer = (props: Props) => {
     return (
         <div className={ `w-full` }>
 
-            <div className={ 'flex transition bg-zinc-300/80 dark:bg-gray-600/25' }>
+            <div className={ 'flex transition bg-zinc-300/80 dark:bg-[#1c1c22]/50' }>
                 <div className={ `p-8 w-full overflow-hidden` }>
                     <div className={ 'relative' }>
                         <FaCreativeCommons
