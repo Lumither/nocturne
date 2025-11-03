@@ -20,23 +20,25 @@ else
     COMPOSE_FILE := prod.compose.yaml
 endif
 
+DOCKER_ENV := ARCH=$(ARCH) TAG=$(CHANNEL)
+DOCKER_COMPOSE := $(DOCKER_ENV) docker compose -f $(COMPOSE_FILE)
 
 .PHONY: all
 all:up
 
 .PHONY: build
 build:
-	ARCH=$(ARCH) TAG=$(CHANNEL) docker compose -f $(COMPOSE_FILE) pull
-	ARCH=$(ARCH) TAG=$(CHANNEL) docker compose -f $(COMPOSE_FILE) build
+	$(DOCKER_COMPOSE) pull
+	$(DOCKER_COMPOSE) build
 
 .PHONY: up
 up:
-	ARCH=$(ARCH) docker compose -f $(COMPOSE_FILE) up -d
+	$(DOCKER_COMPOSE) up -d
 
 .PHONY: down
 down:
-	ARCH=$(ARCH) docker compose -f $(COMPOSE_FILE) down
+	$(DOCKER_COMPOSE) down
 
 .PHONY: clean
 clean:
-	ARCH=$(ARCH) docker compose -f $(COMPOSE_FILE) down --rmi all --volumes
+	$(DOCKER_COMPOSE) down --rmi all --volumes
