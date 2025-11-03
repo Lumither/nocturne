@@ -1,0 +1,54 @@
+services:
+  frontend:
+    depends_on:
+      - backend
+    image: cr.lmt.moe/nocturne/frontend:${TAG}
+    restart: always
+    ports:
+      - "0.0.0.0:3000:3000"
+    env_file:
+      - ./.env
+
+
+  backend:
+    depends_on:
+      - migrate
+    image: cr.lmt.moe/nocturne/backend:${TAG}
+    restart: always
+    ports:
+      - "0.0.0.0:3001:3001"
+    env_file:
+      - ./.env
+      - ./.env.local
+    dns:
+      - 1.1.1.1
+
+
+  migrate:
+    image: postgres:17
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./.env
+      - ./.env.local
+    volumes:
+      - ./migration/ddl:/migrations:ro
+      - ./migration/migration.sh:/migration.sh:ro
+    entrypoint: [ "/bin/sh", "/migration.sh" ]
+
+
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env
+      - ./.env.local
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: always

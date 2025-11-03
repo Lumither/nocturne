@@ -1,12 +1,12 @@
-name: build canary nocturne image
+name: build release nocturne image
 on:
   push:
     branches:
-      - master
+      - release
 
 env:
   REGISTRY: cr.lmt.moe
-  TAG: canary
+  TAG: release
   PROJECT: nocturne
 
 
